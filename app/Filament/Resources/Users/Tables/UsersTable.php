@@ -14,7 +14,13 @@ class UsersTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                TextColumn::make('full_name')
+                    ->label('Nom complet')
+                    ->searchable(),
+                TextColumn::make('type')
+                    ->badge()
+                    ->sortable(),
+                TextColumn::make('telephone')
                     ->searchable(),
                 TextColumn::make('email')
                     ->label('Email address')
