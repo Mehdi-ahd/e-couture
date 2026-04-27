@@ -21,7 +21,7 @@ test('new users can register', function () {
         'nom' => 'Doe',
         'prenom' => 'Jane',
         'telephone' => '+22990000001',
-        'type' => 'CLIENT',
+        'type' => 'COUTURIER',
     ]);
     $response->assertRedirect(route('dashboard', absolute: false));
 });

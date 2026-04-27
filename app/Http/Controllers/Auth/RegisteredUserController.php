@@ -39,7 +39,7 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'type' => 'CLIENT',
+            'type' => 'COUTURIER',
             'nom' => $request->nom,
             'prenom' => $request->prenom,
             'telephone' => $request->telephone,

@@ -11,9 +11,15 @@ use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable([
     'external_id',
@@ -38,9 +44,12 @@ use Illuminate\Notifications\Notifiable;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentHasName, FilamentUser, MustVerifyEmailContract
 {
+    use HasApiTokens;
+
     /** @use HasFactory<UserFactory> */
     use HasExternalId;
     use HasFactory;
+    use HasRoles;
     use MustVerifyEmail;
     use Notifiable;
 
@@ -55,6 +64,100 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
             'est_actif' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    public function fichesClientsCommeCouturier(): HasMany
+    {
+        return $this->hasMany(FicheClient::class, 'couturier_id');
+    }
+
+    public function compteSocialPrincipal(): HasOne
+    {
+        return $this->hasOne(SocialAccount::class);
+    }
+
+    public function comptesSociaux(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
+    public function fichesClientsCommeClient(): HasMany
+    {
+        return $this->hasMany(FicheClient::class, 'client_id');
+    }
+
+    public function fichesMesures(): HasMany
+    {
+        return $this->hasMany(FicheMesure::class, 'client_id');
+    }
+
+    public function modelesVetementsCrees(): HasMany
+    {
+        return $this->hasMany(ModeleVetement::class, 'createur_id');
+    }
+
+    public function notesCouturierEmises(): HasMany
+    {
+        return $this->hasMany(NoteCouturier::class, 'client_id');
+    }
+
+    public function notesCouturierRecues(): HasMany
+    {
+        return $this->hasMany(NoteCouturier::class, 'couturier_id');
+    }
+
+    public function commandesCommeCouturier(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            CommandeVetement::class,
+            FicheClient::class,
+            'couturier_id',
+            'fiche_client_id',
+            'id',
+            'id',
+        );
+    }
+
+    public function commandesCommeClient(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            CommandeVetement::class,
+            FicheClient::class,
+            'client_id',
+            'fiche_client_id',
+            'id',
+            'id',
+        );
+    }
+
+    public function scopeCouturiers(Builder $query): Builder
+    {
+        return $query->where('type', 'COUTURIER');
+    }
+
+    public function scopeClients(Builder $query): Builder
+    {
+        return $query->where('type', 'CLIENT');
+    }
+
+    public function scopeAdministrateurs(Builder $query): Builder
+    {
+        return $query->where('type', 'ADMINISTRATEUR');
+    }
+
+    public function isCouturier(): bool
+    {
+        return $this->type === 'COUTURIER';
+    }
+
+    public function isClient(): bool
+    {
+        return $this->type === 'CLIENT';
+    }
+
+    public function isAdministrateur(): bool
+    {
+        return $this->type === 'ADMINISTRATEUR';
     }
 
     public function getFullNameAttribute(): string

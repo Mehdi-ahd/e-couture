@@ -1,0 +1,40 @@
+-On integre pas les clients comme utilisateurs de la plateforme: Ce qui est à faire actuellement c'est qu'on revient aux bases même du projet: "La prise de mesure par les couturiers". On retire donc l'aspect implication du client dans la plateforme. 
+
+
+Pour la problématique:
+• Erreurs et imprécisions dans la prise de mesures au mètre-ruban
+• Perte de temps dans la saisie et le recalcul manuel des dimensions secondaires
+• Difficulté à retrouver et centraliser les fiches clients sur papier(Ici on doit parler plus précisement du probleme de prise de notation des mesures sur papier avec les risques de perte dans plusieurs cas de figure)
+
+
+Pour les objectifs:
+Pour les couturiers :
+• Prise de mesure assistée
+• Génération automatique des mesures
+• Gestion des données(regroupe Centraliser les fiches clients dans un carnet virtuel privé par couturier
+• Accéder à une bibliothèque globale collaborative de modèles de vêtements préenregistrés
+• Générer et afficher des patrons adaptés aux mensurations réelles de chaque client)
+Ici on simplifie au maximum pour que la compréhension soit maximale pour toute personne en possession du document
+On retire tout ce qui est concernant le client, on l'exclu d'abord de notre périmètre d'action.
+
+
+Pour le périmètre fonctionnel:
+Authentification 
+Référentiels Types de vêtements, types de mensurations, règles de proportion
+Carnet clients CRUD des fiches clients (FicheClient = AssociationClass), historique des mesures par
+client
+
+Prise de mesures Guidage photo multi-angles (Flutter), estimation on-device via ML Kit Pose Detection,
+calibration AR + carte physique, déduction secondaires (Laravel), saisie manuelle
+
+Bibliothèque globale Base commune de modèles de vêtements partagée entre tous les couturiers, contributions
+modérées par l'admin
+
+Initialisation modèles Création en 2 étapes : mensurations de référence + patron (3 méthodes : upload, éditeur
+web Filament, génération IA V2)
+
+Gestion des patrons Upload, création via éditeur web Filament, affichage 2D avec cotations positionnées
+Génération adaptée Calcul du patron adapté aux mensurations du client, recalcul des cotations à la volée (non
+persisté)
+
+
