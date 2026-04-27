@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Users\Tables;
+namespace App\Filament\Resources\Paiements\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -8,26 +8,34 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class UsersTable
+class PaiementsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('full_name')
-                    ->label('Nom complet')
-                    ->searchable(['nom', 'prenom']),
-                TextColumn::make('type')
-                    ->badge()
+                TextColumn::make('external_id')
+                    ->searchable(),
+                TextColumn::make('commande_id')
+                    ->numeric()
                     ->sortable(),
-                TextColumn::make('telephone')
+                TextColumn::make('mode')
                     ->searchable(),
-                TextColumn::make('email')
-                    ->label('Email address')
+                TextColumn::make('montant')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('devise')
                     ->searchable(),
-                TextColumn::make('email_verified_at')
+                TextColumn::make('statut')
+                    ->searchable(),
+                TextColumn::make('date_initiation')
                     ->dateTime()
                     ->sortable(),
+                TextColumn::make('date_confirmation')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('reference_externe')
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

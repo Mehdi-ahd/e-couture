@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Users\Tables;
+namespace App\Filament\Resources\ModeleVetements\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -8,26 +8,26 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class UsersTable
+class ModeleVetementsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('full_name')
-                    ->label('Nom complet')
-                    ->searchable(['nom', 'prenom']),
-                TextColumn::make('type')
-                    ->badge()
-                    ->sortable(),
-                TextColumn::make('telephone')
+                TextColumn::make('external_id')
                     ->searchable(),
-                TextColumn::make('email')
-                    ->label('Email address')
-                    ->searchable(),
-                TextColumn::make('email_verified_at')
-                    ->dateTime()
+                TextColumn::make('type_vetement_id')
+                    ->numeric()
                     ->sortable(),
+                TextColumn::make('createur_id')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('nom')
+                    ->searchable(),
+                TextColumn::make('portee')
+                    ->searchable(),
+                TextColumn::make('statut')
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

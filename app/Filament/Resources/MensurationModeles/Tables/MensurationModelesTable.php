@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Users\Tables;
+namespace App\Filament\Resources\MensurationModeles\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -8,25 +8,22 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class UsersTable
+class MensurationModelesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('full_name')
-                    ->label('Nom complet')
-                    ->searchable(['nom', 'prenom']),
-                TextColumn::make('type')
-                    ->badge()
+                TextColumn::make('external_id')
+                    ->searchable(),
+                TextColumn::make('modele_vetement_id')
+                    ->numeric()
                     ->sortable(),
-                TextColumn::make('telephone')
-                    ->searchable(),
-                TextColumn::make('email')
-                    ->label('Email address')
-                    ->searchable(),
-                TextColumn::make('email_verified_at')
-                    ->dateTime()
+                TextColumn::make('type_mensuration_id')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('valeur')
+                    ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

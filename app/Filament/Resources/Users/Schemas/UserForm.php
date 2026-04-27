@@ -32,11 +32,13 @@ class UserForm
                 TextInput::make('telephone')
                     ->tel()
                     ->maxLength(20)
+                    ->unique(ignoreRecord: true)
                     ->required(),
                 TextInput::make('email')
                     ->label('Email address')
                     ->email()
                     ->maxLength(190)
+                    ->unique(ignoreRecord: true)
                     ->required(),
                 TextInput::make('specialite')
                     ->maxLength(150),

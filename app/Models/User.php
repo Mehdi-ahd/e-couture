@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Models\Concerns\HasExternalId;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName as FilamentHasName;
+use Filament\Panel;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
-use Illuminate\Database\Eloquent\Attributes\Computed;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -34,7 +36,7 @@ use Illuminate\Notifications\Notifiable;
     'notes',
 ])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements MustVerifyEmailContract
+class User extends Authenticatable implements FilamentHasName, FilamentUser, MustVerifyEmailContract
 {
     /** @use HasFactory<UserFactory> */
     use HasExternalId;
@@ -55,15 +57,27 @@ class User extends Authenticatable implements MustVerifyEmailContract
         ];
     }
 
-    #[Computed]
-    public function fullName(): string
+    public function getFullNameAttribute(): string
     {
         return trim($this->prenom.' '.$this->nom);
     }
 
-    #[Computed]
-    public function name(): string
+    public function getNameAttribute(): string
     {
         return $this->full_name;
+    }
+
+    public function getFilamentName(): string
+    {
+        return $this->full_name;
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        if (app()->isLocal()) {
+            return true;
+        }
+
+        return $this->type === 'ADMINISTRATEUR';
     }
 }

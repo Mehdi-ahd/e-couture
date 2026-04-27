@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Users\Tables;
+namespace App\Filament\Resources\PiecePatrons\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -8,25 +8,21 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class UsersTable
+class PiecePatronsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('full_name')
-                    ->label('Nom complet')
-                    ->searchable(['nom', 'prenom']),
-                TextColumn::make('type')
-                    ->badge()
+                TextColumn::make('external_id')
+                    ->searchable(),
+                TextColumn::make('patron_id')
+                    ->numeric()
                     ->sortable(),
-                TextColumn::make('telephone')
+                TextColumn::make('nom')
                     ->searchable(),
-                TextColumn::make('email')
-                    ->label('Email address')
-                    ->searchable(),
-                TextColumn::make('email_verified_at')
-                    ->dateTime()
+                TextColumn::make('ordre')
+                    ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
