@@ -94,13 +94,13 @@ class SocialAuthController extends Controller
             [$prenom, $nom] = $this->splitName($providerUser);
 
             $user = User::create([
-                'type' => 'COUTURIER',
                 'nom' => $nom,
                 'prenom' => $prenom,
                 'email' => $providerUser->getEmail(),
                 'password' => Hash::make(Str::password(32)),
                 'email_verified_at' => $providerUser->getEmail() ? now() : null,
             ]);
+            $user->assignApplicationRole(User::ROLE_COUTURIER);
 
             event(new Registered($user));
             $wasCreated = true;

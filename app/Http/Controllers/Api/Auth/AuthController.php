@@ -18,13 +18,13 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create([
-            'type' => 'COUTURIER',
             'nom' => $request->string('nom')->toString(),
             'prenom' => $request->string('prenom')->toString(),
             'telephone' => $request->string('telephone')->toString(),
             'email' => $request->string('email')->lower()->toString(),
             'password' => Hash::make($request->string('password')->toString()),
         ]);
+        $user->assignApplicationRole(User::ROLE_COUTURIER);
 
         event(new Registered($user));
 
@@ -98,13 +98,14 @@ class AuthController extends Controller
     {
         return [
             'external_id' => $user->external_id,
-            'type' => $user->type,
             'nom' => $user->nom,
             'prenom' => $user->prenom,
             'full_name' => $user->full_name,
             'email' => $user->email,
             'telephone' => $user->telephone,
             'est_actif' => $user->est_actif,
+            'roles' => $user->getRoleNames()->values()->all(),
+            'primary_role' => $user->primary_role,
             'email_verified_at' => $user->email_verified_at?->toAtomString(),
             'last_login_at' => $user->last_login_at?->toAtomString(),
         ];

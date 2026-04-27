@@ -19,11 +19,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable([
     'external_id',
-    'type',
     'nom',
     'prenom',
     'email',
@@ -44,10 +44,17 @@ use Spatie\Permission\Traits\HasRoles;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentHasName, FilamentUser, MustVerifyEmailContract
 {
+    public const ROLE_ADMINISTRATEUR = 'administrateur';
+
+    public const ROLE_CLIENT = 'client';
+
+    public const ROLE_COUTURIER = 'couturier';
+
     use HasApiTokens;
 
     /** @use HasFactory<UserFactory> */
     use HasExternalId;
+
     use HasFactory;
     use HasRoles;
     use MustVerifyEmail;
@@ -132,32 +139,49 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
 
     public function scopeCouturiers(Builder $query): Builder
     {
-        return $query->where('type', 'COUTURIER');
+        return $query->role(self::ROLE_COUTURIER);
     }
 
     public function scopeClients(Builder $query): Builder
     {
-        return $query->where('type', 'CLIENT');
+        return $query->role(self::ROLE_CLIENT);
     }
 
     public function scopeAdministrateurs(Builder $query): Builder
     {
-        return $query->where('type', 'ADMINISTRATEUR');
+        return $query->role(self::ROLE_ADMINISTRATEUR);
     }
 
     public function isCouturier(): bool
     {
-        return $this->type === 'COUTURIER';
+        return $this->hasRole(self::ROLE_COUTURIER);
     }
 
     public function isClient(): bool
     {
-        return $this->type === 'CLIENT';
+        return $this->hasRole(self::ROLE_CLIENT);
     }
 
     public function isAdministrateur(): bool
     {
-        return $this->type === 'ADMINISTRATEUR';
+        return $this->hasRole(self::ROLE_ADMINISTRATEUR);
+    }
+
+    public static function ensureRole(string $roleName): Role
+    {
+        return Role::findOrCreate($roleName);
+    }
+
+    public function assignApplicationRole(string $roleName): self
+    {
+        $this->assignRole(self::ensureRole($roleName));
+
+        return $this;
+    }
+
+    public function getPrimaryRoleAttribute(): ?string
+    {
+        return $this->getRoleNames()->first();
     }
 
     public function getFullNameAttribute(): string
@@ -181,6 +205,6 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
             return true;
         }
 
-        return $this->type === 'ADMINISTRATEUR';
+        return $this->hasRole(self::ROLE_ADMINISTRATEUR);
     }
 }

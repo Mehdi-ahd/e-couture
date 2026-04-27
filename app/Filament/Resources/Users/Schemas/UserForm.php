@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -9,6 +10,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserForm
 {
@@ -16,13 +18,6 @@ class UserForm
     {
         return $schema
             ->components([
-                Select::make('type')
-                    ->options([
-                        'COUTURIER' => 'Couturier',
-                        'ADMINISTRATEUR' => 'Administrateur',
-                        'CLIENT' => 'Client',
-                    ])
-                    ->required(),
                 TextInput::make('nom')
                     ->required()
                     ->maxLength(80),
@@ -45,6 +40,13 @@ class UserForm
                 Textarea::make('adresse_atelier'),
                 Textarea::make('bio'),
                 DatePicker::make('date_naissance'),
+                Select::make('roles')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->required()
+                    ->default([User::ROLE_COUTURIER])
+                    ->getOptionLabelFromRecordUsing(fn (mixed $record): string => Str::headline($record->name)),
                 Select::make('kyc_statut')
                     ->options([
                         'NON_SOUMIS' => 'Non soumis',

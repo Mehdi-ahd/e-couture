@@ -17,6 +17,15 @@ class UserFactory extends Factory
      */
     protected static ?string $password;
 
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            if (! $user->hasAnyRole()) {
+                $user->assignApplicationRole(User::ROLE_COUTURIER);
+            }
+        });
+    }
+
     /**
      * Define the model's default state.
      *
@@ -25,7 +34,6 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => 'COUTURIER',
             'nom' => fake()->lastName(),
             'prenom' => fake()->firstName(),
             'email' => fake()->unique()->safeEmail(),

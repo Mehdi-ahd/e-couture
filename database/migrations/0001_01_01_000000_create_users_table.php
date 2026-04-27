@@ -11,7 +11,6 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->char('external_id', 36)->unique('uniq_users_external_id');
-            $table->enum('type', ['COUTURIER', 'ADMINISTRATEUR', 'CLIENT']);
             $table->string('nom', 80);
             $table->string('prenom', 80);
             $table->string('email', 190)->nullable();
@@ -40,7 +39,6 @@ return new class extends Migration
 
             $table->unique('email', 'uniq_users_email');
             $table->unique('telephone', 'uniq_users_telephone');
-            $table->index('type', 'idx_users_type');
             $table->index('kyc_statut', 'idx_users_kyc_statut');
             $table->index('specialite', 'idx_users_specialite');
         });

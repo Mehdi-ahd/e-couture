@@ -17,9 +17,10 @@ class UsersTable
                 TextColumn::make('full_name')
                     ->label('Nom complet')
                     ->searchable(['nom', 'prenom']),
-                TextColumn::make('type')
+                TextColumn::make('roles.name')
+                    ->label('Roles')
                     ->badge()
-                    ->sortable(),
+                    ->separator(', '),
                 TextColumn::make('telephone')
                     ->searchable(),
                 TextColumn::make('email')

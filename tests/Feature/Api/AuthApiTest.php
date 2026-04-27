@@ -15,7 +15,8 @@ test('api users can register and receive a sanctum token', function () {
 
     $response
         ->assertCreated()
-        ->assertJsonPath('data.user.type', 'COUTURIER')
+        ->assertJsonPath('data.user.primary_role', User::ROLE_COUTURIER)
+        ->assertJsonPath('data.user.roles.0', User::ROLE_COUTURIER)
         ->assertJsonStructure([
             'message',
             'data' => [
@@ -23,23 +24,23 @@ test('api users can register and receive a sanctum token', function () {
                 'token_type',
                 'user' => [
                     'external_id',
-                    'type',
                     'nom',
                     'prenom',
                     'full_name',
                     'email',
                     'telephone',
                     'est_actif',
+                    'roles',
+                    'primary_role',
                     'email_verified_at',
                     'last_login_at',
                 ],
             ],
         ]);
 
-    $this->assertDatabaseHas('users', [
-        'email' => 'jane@example.com',
-        'type' => 'COUTURIER',
-    ]);
+    $user = User::query()->where('email', 'jane@example.com')->firstOrFail();
+
+    expect($user->hasRole(User::ROLE_COUTURIER))->toBeTrue();
 });
 
 test('api users can login and read their profile', function () {

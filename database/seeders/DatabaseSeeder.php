@@ -15,13 +15,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::ensureRole(User::ROLE_ADMINISTRATEUR);
+        User::ensureRole(User::ROLE_COUTURIER);
+        User::ensureRole(User::ROLE_CLIENT);
 
-        User::factory()->create([
+        $admin = User::factory()->create([
             'nom' => 'User',
             'prenom' => 'Test',
             'telephone' => '+22990000000',
             'email' => 'test@example.com',
         ]);
+
+        $admin->syncRoles([User::ROLE_ADMINISTRATEUR]);
     }
 }

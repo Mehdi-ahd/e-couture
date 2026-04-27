@@ -39,13 +39,13 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'type' => 'COUTURIER',
             'nom' => $request->nom,
             'prenom' => $request->prenom,
             'telephone' => $request->telephone,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+        $user->assignApplicationRole(User::ROLE_COUTURIER);
 
         event(new Registered($user));
 
