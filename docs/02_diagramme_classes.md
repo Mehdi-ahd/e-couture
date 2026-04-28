@@ -10,10 +10,11 @@
 
 Le modèle se décompose en cinq grandes zones :
 1. **Référentiels** : types de vêtements, types de mensurations, règles de proportion
-2. **Acteurs / Utilisateurs** : hiérarchie par rôle (`Couturier`, `Administrateur`, `Client`) — tous spécialisations de la classe abstraite `Utilisateur`
-3. **Fiches clients d'un couturier** : la relation N:M entre `Couturier` et `Client` est portée par la **classe-association `FicheClient`** (anciennement `CarnetClient`) qui contient les informations privées du carnet (notes du couturier, archivage, etc.). Chaque fiche peut produire un historique de mesures.
-4. **Bibliothèque & Modèles de vêtements** : modèles à portée globale (partagée) ou privée, mensurations de référence, patrons annotés
-5. **Commandes** : `CommandeVetement` lie un client, un couturier et un modèle ; le patron adapté est généré dynamiquement à l'initialisation (non persisté)
+2. **Acteurs / Utilisateurs** : hiérarchie par rôle (`Couturier`, `Administrateur`, `Client`) — tous spécialisations de la cl
+3. asse abstraite `Utilisateur`
+4. **Fiches clients d'un couturier** : la relation N:M entre `Couturier` et `Client` est portée par la **classe-association `FicheClient`** (anciennement `CarnetClient`) qui contient les informations privées du carnet (notes du couturier, archivage, etc.). Chaque fiche peut produire un historique de mesures.
+5. **Bibliothèque & Modèles de vêtements** : modèles à portée globale (partagée) ou privée, mensurations de référence, patrons annotés
+6. **Commandes** : `CommandeVetement` lie un client, un couturier et un modèle ; le patron adapté est généré dynamiquement à l'initialisation (non persisté)
 
 > **Évolution V1** : `Client` est maintenant une **classe d'utilisateur de plein droit** (sous-classe d'`Utilisateur`) car le client dispose désormais d'un compte. Les données privées que le couturier conserve sur ses clients (notes, archivage du carnet) sont déplacées dans la classe-association `FicheClient`.
 
