@@ -15,15 +15,21 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->date('date_commande');
             $table->date('date_livraison')->nullable();
+
             $table->foreignId('client_id')
                   ->constrained('clients')
                   ->restrictOnDelete();
+
             $table->foreignId('model_vetement_id')
                   ->constrained('model_vetements')
                   ->restrictOnDelete();
+
+            // Nullable : une commande peut référencer 0 ou 1 fiche de mesures (0..1)
             $table->foreignId('fiche_mesure_id')
+                  ->nullable()
                   ->constrained('fiche_mesures')
-                  ->restrictOnDelete();
+                  ->nullOnDelete();
+
             $table->timestamps();
         });
     }

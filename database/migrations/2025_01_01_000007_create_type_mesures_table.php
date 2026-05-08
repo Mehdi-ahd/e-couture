@@ -8,24 +8,23 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('clients', function (Blueprint $table) {
+        Schema::create('type_mesures', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
+            $table->string('code')->unique();
             $table->string('nom');
-            $table->string('prenom');
-            $table->string('telephone');
-            $table->string('email')->nullable();
-            $table->date('date_naissance')->nullable();
+            $table->string('unite'); // cm, mm, etc.
+            $table->string('categorie'); // principale, secondaire, etc.
+            $table->text('description')->nullable();
             $table->boolean('est_actif')->default(true);
-            $table->foreignId('prestataire_id')
-                  ->constrained('users')
+            $table->foreignId('model_vetement_id')
+                  ->constrained('model_vetements')
                   ->cascadeOnDelete();
-            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('clients');
+        Schema::dropIfExists('type_mesures');
     }
 };
