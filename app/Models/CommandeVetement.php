@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CommandeVetement extends BaseModel
 {
-    protected $table = 'commandes_vetements';
+    protected $table = 'commande_vetements';
 
     protected function casts(): array
     {
@@ -18,14 +18,14 @@ class CommandeVetement extends BaseModel
         ];
     }
 
-    public function ficheClient(): BelongsTo
+    public function client(): BelongsTo
     {
-        return $this->belongsTo(FicheClient::class, 'fiche_client_id');
+        return $this->belongsTo(Client::class, 'client_id');
     }
 
     public function modeleVetement(): BelongsTo
     {
-        return $this->belongsTo(ModeleVetement::class, 'modele_vetement_id');
+        return $this->belongsTo(ModeleVetement::class, 'model_vetement_id');
     }
 
     public function ficheMesure(): BelongsTo
@@ -41,19 +41,5 @@ class CommandeVetement extends BaseModel
     public function noteCouturier(): HasOne
     {
         return $this->hasOne(NoteCouturier::class, 'commande_id');
-    }
-
-    public function getCouturierAttribute(): ?User
-    {
-        return $this->relationLoaded('ficheClient')
-            ? $this->ficheClient?->couturier
-            : $this->ficheClient()->with('couturier')->first()?->couturier;
-    }
-
-    public function getClientAttribute(): ?User
-    {
-        return $this->relationLoaded('ficheClient')
-            ? $this->ficheClient?->client
-            : $this->ficheClient()->with('client')->first()?->client;
     }
 }

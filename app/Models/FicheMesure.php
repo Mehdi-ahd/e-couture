@@ -7,19 +7,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FicheMesure extends BaseModel
 {
-    protected $table = 'fiches_mesures';
+    protected $table = 'fiche_mesures';
 
     protected function casts(): array
     {
         return [
-            'date_prise' => 'date',
+            'date' => 'date',
             'version_regles' => 'integer',
         ];
     }
 
     public function client(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'client_id');
+        return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function prestataire(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'prestataire_id');
     }
 
     public function lignesMensurations(): HasMany

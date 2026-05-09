@@ -19,7 +19,7 @@ class Patron extends BaseModel
 
     public function modeleVetement(): BelongsTo
     {
-        return $this->belongsTo(ModeleVetement::class, 'modele_vetement_id');
+        return $this->belongsTo(ModeleVetement::class, 'model_vetement_id');
     }
 
     public function piecesPatrons(): HasMany

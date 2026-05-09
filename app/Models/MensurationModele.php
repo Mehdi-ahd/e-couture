@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MensurationModele extends BaseModel
 {
-    protected $table = 'mensurations_modeles';
+    protected $table = 'mesure_modeles';
 
     protected function casts(): array
     {
@@ -17,11 +17,11 @@ class MensurationModele extends BaseModel
 
     public function modeleVetement(): BelongsTo
     {
-        return $this->belongsTo(ModeleVetement::class, 'modele_vetement_id');
+        return $this->belongsTo(ModeleVetement::class, 'model_vetement_id');
     }
 
     public function typeMensuration(): BelongsTo
     {
-        return $this->belongsTo(TypeMensuration::class, 'type_mensuration_id');
+        return $this->belongsTo(TypeMensuration::class, 'type_mesure_id');
     }
 }

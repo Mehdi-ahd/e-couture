@@ -15,6 +15,6 @@ class AnnotationPatron extends BaseModel
 
     public function typeMensuration(): BelongsTo
     {
-        return $this->belongsTo(TypeMensuration::class, 'type_mensuration_id');
+        return $this->belongsTo(TypeMensuration::class, 'type_mesure_id');
     }
 }

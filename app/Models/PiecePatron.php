@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PiecePatron extends BaseModel
 {
-    protected $table = 'pieces_patrons';
+    protected $table = 'pieces_patron';
 
     protected function casts(): array
     {
@@ -25,5 +25,10 @@ class PiecePatron extends BaseModel
     public function annotationsPatrons(): HasMany
     {
         return $this->hasMany(AnnotationPatron::class, 'piece_patron_id');
+    }
+
+    public function dispositions(): HasMany
+    {
+        return $this->hasMany(DispositionPiecePatron::class, 'piece_patron_id');
     }
 }

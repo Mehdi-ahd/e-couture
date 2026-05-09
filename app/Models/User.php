@@ -30,16 +30,17 @@ use Spatie\Permission\Traits\HasRoles;
     'telephone',
     'password',
     'est_actif',
-    'kyc_type_piece',
+    'type_piece',
     'kyc_statut',
-    'kyc_motif_rejet',
-    'kyc_date_soumission',
-    'kyc_date_validation',
+    'motif_rejet',
+    'date_soumission',
+    'date_validation',
     'specialite',
     'adresse_atelier',
     'bio',
     'date_naissance',
-    'notes',
+    'notes_personnelles',
+    'last_login_at',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentHasName, FilamentUser, MustVerifyEmailContract
@@ -65,17 +66,17 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
         return [
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
-            'kyc_date_soumission' => 'datetime',
-            'kyc_date_validation' => 'datetime',
+            'date_soumission' => 'datetime',
+            'date_validation' => 'datetime',
             'date_naissance' => 'date',
             'est_actif' => 'boolean',
             'password' => 'hashed',
         ];
     }
 
-    public function fichesClientsCommeCouturier(): HasMany
+    public function clients(): HasMany
     {
-        return $this->hasMany(FicheClient::class, 'couturier_id');
+        return $this->hasMany(Client::class, 'prestataire_id');
     }
 
     public function compteSocialPrincipal(): HasOne
@@ -88,53 +89,14 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
         return $this->hasMany(SocialAccount::class);
     }
 
-    public function fichesClientsCommeClient(): HasMany
-    {
-        return $this->hasMany(FicheClient::class, 'client_id');
-    }
-
     public function fichesMesures(): HasMany
     {
-        return $this->hasMany(FicheMesure::class, 'client_id');
+        return $this->hasMany(FicheMesure::class, 'prestataire_id');
     }
 
     public function modelesVetementsCrees(): HasMany
     {
-        return $this->hasMany(ModeleVetement::class, 'createur_id');
-    }
-
-    public function notesCouturierEmises(): HasMany
-    {
-        return $this->hasMany(NoteCouturier::class, 'client_id');
-    }
-
-    public function notesCouturierRecues(): HasMany
-    {
-        return $this->hasMany(NoteCouturier::class, 'couturier_id');
-    }
-
-    public function commandesCommeCouturier(): HasManyThrough
-    {
-        return $this->hasManyThrough(
-            CommandeVetement::class,
-            FicheClient::class,
-            'couturier_id',
-            'fiche_client_id',
-            'id',
-            'id',
-        );
-    }
-
-    public function commandesCommeClient(): HasManyThrough
-    {
-        return $this->hasManyThrough(
-            CommandeVetement::class,
-            FicheClient::class,
-            'client_id',
-            'fiche_client_id',
-            'id',
-            'id',
-        );
+        return $this->hasMany(ModeleVetement::class, 'prestataire_id');
     }
 
     public function scopeCouturiers(Builder $query): Builder

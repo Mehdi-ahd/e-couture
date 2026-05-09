@@ -20,11 +20,11 @@ class RegleProportion extends BaseModel
 
     public function mensurationSource(): BelongsTo
     {
-        return $this->belongsTo(TypeMensuration::class, 'mensuration_source_id');
+        return $this->belongsTo(TypeMensuration::class, 'type_mesure_source_id');
     }
 
     public function mensurationCible(): BelongsTo
     {
-        return $this->belongsTo(TypeMensuration::class, 'mensuration_cible_id');
+        return $this->belongsTo(TypeMensuration::class, 'type_mesure_cible_id');
     }
 }
