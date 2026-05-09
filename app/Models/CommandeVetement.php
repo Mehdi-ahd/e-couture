@@ -33,6 +33,11 @@ class CommandeVetement extends BaseModel
         return $this->belongsTo(FicheMesure::class, 'fiche_mesure_id');
     }
 
+    public function ficheClient(): BelongsTo
+    {
+        return $this->belongsTo(FicheClient::class, 'fiche_client_id');
+    }
+
     public function paiements(): HasMany
     {
         return $this->hasMany(Paiement::class, 'commande_id');

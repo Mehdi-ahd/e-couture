@@ -90,6 +90,7 @@ class MobileAuthSyncController extends Controller
                     'roles' => $user->getRoleNames()->values()->all(),
                     'primary_role' => $user->primary_role,
                 ],
+                'needs_onboarding' => $user->mobile_onboarding_completed_at === null,
             ],
         ]);
     }

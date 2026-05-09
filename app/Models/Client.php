@@ -31,4 +31,9 @@ class Client extends BaseModel
     {
         return $this->hasMany(CommandeVetement::class, 'client_id');
     }
+
+    public function fichesClients(): HasMany
+    {
+        return $this->hasMany(FicheClient::class, 'client_id');
+    }
 }

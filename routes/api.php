@@ -3,6 +3,9 @@
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\SocialAuthController;
 use App\Http\Controllers\Api\Mobile\MobileAuthSyncController;
+use App\Http\Controllers\Api\Mobile\MobileClientController;
+use App\Http\Controllers\Api\Mobile\MobileOnboardingController;
+use App\Http\Controllers\Api\Mobile\MobilePatternController;
 use App\Http\Controllers\Api\Mobile\MobileWorkspaceController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,5 +28,8 @@ Route::prefix('mobile')->name('api.mobile.')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('workspace', MobileWorkspaceController::class)->name('workspace');
+        Route::post('onboarding/complete', MobileOnboardingController::class)->name('onboarding.complete');
+        Route::apiResource('clients', MobileClientController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::apiResource('patterns', MobilePatternController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
     });
 });

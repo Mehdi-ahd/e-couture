@@ -68,7 +68,10 @@ class MobileWorkspaceController extends Controller
                     $latestCommand = $client->commandesVetements->first();
 
                     return [
+                        'external_id' => $client->external_id,
                         'name' => trim($client->prenom.' '.$client->nom),
+                        'telephone' => $client->telephone,
+                        'email' => $client->email,
                         'look_label' => $latestCommand?->modeleVetement?->nom ?? 'Carnet client',
                         'next_action' => $this->resolveNextAction($latestMeasure?->statut),
                         'last_visit_label' => $latestMeasure?->date?->format('d/m') ?? 'Nouveau',
@@ -84,7 +87,9 @@ class MobileWorkspaceController extends Controller
                         ->count();
 
                     return [
+                        'external_id' => $patron->external_id,
                         'title' => $patron->modeleVetement?->nom ?? 'Patron',
+                        'description' => $patron->modeleVetement?->description ?? '',
                         'pieces_label' => sprintf('%d pièce%s', $pieceCount, $pieceCount > 1 ? 's' : ''),
                         'materials_label' => sprintf('%d matériau%s', $materialCount, $materialCount > 1 ? 'x' : ''),
                         'status_label' => ucfirst((string) $patron->statut),
