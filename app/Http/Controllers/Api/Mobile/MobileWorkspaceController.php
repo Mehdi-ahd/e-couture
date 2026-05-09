@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Mobile;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use App\Models\CommandeVetement;
 use App\Models\Patron;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -58,6 +59,13 @@ class MobileWorkspaceController extends Controller
             ->take(5)
             ->get();
 
+        $recentOrders = CommandeVetement::query()
+            ->whereHas('client', fn ($query) => $query->where('prestataire_id', $user->id))
+            ->with(['client', 'modeleVetement'])
+            ->latest('date_commande')
+            ->take(4)
+            ->get();
+
         return response()->json([
             'data' => [
                 'active_client_count' => $activeClientCount,
@@ -75,6 +83,17 @@ class MobileWorkspaceController extends Controller
                         'look_label' => $latestCommand?->modeleVetement?->nom ?? 'Carnet client',
                         'next_action' => $this->resolveNextAction($latestMeasure?->statut),
                         'last_visit_label' => $latestMeasure?->date?->format('d/m') ?? 'Nouveau',
+                    ];
+                })->values()->all(),
+                'recent_orders' => $recentOrders->map(function (CommandeVetement $order): array {
+                    return [
+                        'external_id' => $order->external_id,
+                        'client_name' => trim(($order->client?->prenom ?? '').' '.($order->client?->nom ?? '')),
+                        'title' => $order->modeleVetement?->nom ?? 'Commande atelier',
+                        'status' => $order->statut,
+                        'status_label' => ucfirst(str_replace('_', ' ', (string) $order->statut)),
+                        'status_tone' => $this->mapOrderStatusTone((string) $order->statut),
+                        'date_label' => $order->date_commande?->format('d/m/Y') ?? 'A planifier',
                     ];
                 })->values()->all(),
                 'patterns' => $patterns->map(function (Patron $patron): array {
@@ -116,6 +135,16 @@ class MobileWorkspaceController extends Controller
             'valide' => 'success',
             'archive' => 'warning',
             default => 'info',
+        };
+    }
+
+    private function mapOrderStatusTone(string $status): string
+    {
+        return match ($status) {
+            'fini', 'livre' => 'success',
+            'en_coupe', 'en_cours' => 'info',
+            'archive' => 'warning',
+            default => 'neutral',
         };
     }
 }

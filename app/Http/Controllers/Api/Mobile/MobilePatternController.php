@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Mobile;
 use App\Http\Controllers\Controller;
 use App\Models\ModeleVetement;
 use App\Models\Patron;
+use App\Models\PiecePatron;
 use App\Models\TypeVetement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -87,11 +88,51 @@ class MobilePatternController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
-        $record = $this->findForUser($user, $pattern);
+        $record = $this->findDetailedForUser($user, $pattern);
+        $materialLabels = $record->piecesPatrons
+            ->flatMap(fn (PiecePatron $piece) => $piece->dispositions->pluck('materiau.nom'))
+            ->filter()
+            ->unique()
+            ->values();
+        $cutLabels = $record->piecesPatrons
+            ->flatMap(fn (PiecePatron $piece) => $piece->dispositions->pluck('formeDecoupe.nom'))
+            ->filter()
+            ->unique()
+            ->values();
 
         return response()->json([
             'data' => [
                 'item' => $this->serializePattern($record, $user),
+                'detail' => [
+                    'updated_label' => $record->modeleVetement?->updated_at?->format('d/m/Y') ?? 'A jour',
+                    'owner_label' => $record->modeleVetement?->prestataire_id === $user->id
+                        ? 'Atelier'
+                        : 'Bibliothèque',
+                    'material_labels' => $materialLabels->all(),
+                    'cut_labels' => $cutLabels->all(),
+                    'pieces' => $record->piecesPatrons
+                        ->sortBy('ordre')
+                        ->map(fn (PiecePatron $piece) => [
+                            'external_id' => $piece->external_id,
+                            'name' => $piece->nom,
+                            'order' => $piece->ordre,
+                            'dispositions_count' => $piece->dispositions->count(),
+                            'material_labels' => $piece->dispositions
+                                ->pluck('materiau.nom')
+                                ->filter()
+                                ->unique()
+                                ->values()
+                                ->all(),
+                            'cut_labels' => $piece->dispositions
+                                ->pluck('formeDecoupe.nom')
+                                ->filter()
+                                ->unique()
+                                ->values()
+                                ->all(),
+                        ])
+                        ->values()
+                        ->all(),
+                ],
             ],
         ]);
     }
@@ -165,6 +206,17 @@ class MobilePatternController extends Controller
     {
         return $this->baseQueryForUser($user)
             ->where('external_id', $externalId)
+            ->firstOrFail();
+    }
+
+    private function findDetailedForUser(User $user, string $externalId): Patron
+    {
+        return $this->baseQueryForUser($user)
+            ->where('external_id', $externalId)
+            ->with([
+                'piecesPatrons.dispositions.materiau',
+                'piecesPatrons.dispositions.formeDecoupe',
+            ])
             ->firstOrFail();
     }
 
