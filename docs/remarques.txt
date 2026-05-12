@@ -44,3 +44,10 @@ Bon, j'ai fait une refonte de l'écran d'acceuil avec un walkthrough, je veux qu
 Bon, j'ai vu ce que tu as fais et c'est vraiment pas mal seulement à l'acceuil, je voudrais qu'on évite les salutations "Bonjour" voila, comme je l'ai dit on va à l'éssentiel tout en restant assumé dans le design, apres, la bottombar est déja bien, mais il n'y a pas possibilité d'amélioration /? Apres, je pense qu'on doit commencer à passer aux vrais données, donc tu feras une transition rapide vers le projet e-couture, tu créeras les modeles, les controllers adaptés et les bonnes méthodes pour pouvoir envoyé les données aux écrans de l'application flutter koda, et j'ai constaté qu'on passe la page de connexion maintenant, c'est toi qui a modifié ca? Ou c'est simplement que je suis déja connecté? Parce qu'il faut obligatoirement la connexion et en ce qui concerne la connexion/inscription sociale via google, il faudra faire en sorte, si possible, de stocker les données dans la table users et il faudra aussi commencer à lier les différentes options des écrans pour qu'on ait pas des éléments qui soient là uniquement pour décorer s'ils ne sont pas à l'origine là à but de design.
 Pour la revue des ecrans, mets toi dans la peau des acteurs utilisateurs pour voir ce qui serait le mieux mais aussi voit ce qui est plus commun dans toutes les applications.
  
+ Launching lib/main.dart on TECNO CK6 in debug mode...
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /home/mehdi/.pub-cache/hosted/pub.dev/google_mlkit_commons-0.11.1/android/src/main/java/com/google_mlkit_commons/InputImageConverter.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+Note: /home/mehdi/.pub-cache/hosted/pub.dev/google_mlkit_pose_detection-0.14.1/android/src/main/java/com/google_mlkit_pose_detection/PoseDetector.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
