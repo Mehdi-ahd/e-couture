@@ -14,7 +14,7 @@ class CommandeVetementForm
     {
         return $schema
             ->components([
-                TextInput::make('fiche_client_id')
+                TextInput::make('client_id')
                     ->required()
                     ->numeric(),
                 TextInput::make('modele_vetement_id')

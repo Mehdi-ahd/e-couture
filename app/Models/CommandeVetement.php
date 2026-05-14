@@ -35,7 +35,8 @@ class CommandeVetement extends BaseModel
 
     public function ficheClient(): BelongsTo
     {
-        return $this->belongsTo(FicheClient::class, 'fiche_client_id');
+        // legacy accessor removed
+        return $this->belongsTo(Client::class, 'client_id');
     }
 
     public function paiements(): HasMany

@@ -17,10 +17,14 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('genre')->nullable(); // homme, femme, autre
             $table->date('date_naissance')->nullable();
+            // date_creation kept for compatibility with previous `fiches_clients`
+            $table->timestamp('date_creation')->useCurrent();
             $table->boolean('est_actif')->default(true);
             $table->foreignId('prestataire_id')
                   ->constrained('users')
                   ->cascadeOnDelete();
+            $table->softDeletes();
+            $table->index(['prestataire_id', 'est_actif'], 'idx_clients_prestataire');
             $table->timestamps();
         });
     }

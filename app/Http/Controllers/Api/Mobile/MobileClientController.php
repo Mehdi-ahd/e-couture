@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Mobile;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
-use App\Models\FicheClient;
 use App\Models\LigneMensuration;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -45,19 +44,9 @@ class MobileClientController extends Controller
         $client = Client::query()->create([
             ...$validated,
             'prestataire_id' => $user->id,
+            'date_creation' => now(),
+            'est_actif' => $validated['est_actif'] ?? true,
         ]);
-
-        FicheClient::query()->firstOrCreate(
-            [
-                'couturier_id' => $user->id,
-                'client_id' => $client->id,
-            ],
-            [
-                'date_creation' => now(),
-                'est_actif' => true,
-            ],
-        );
-
         $client = $this->baseQueryForUser($user)
             ->whereKey($client->getKey())
             ->firstOrFail();
@@ -141,12 +130,8 @@ class MobileClientController extends Controller
 
         $record->fill($validated)->save();
 
-        FicheClient::query()
-            ->where('couturier_id', $user->id)
-            ->where('client_id', $record->id)
-            ->update([
-                'est_actif' => $record->est_actif,
-            ]);
+        // fiche_clients merged into clients table: prestataire owns the client
+        // nothing else to update here as est_actif is stored on client
 
         $record = $this->baseQueryForUser($user)
             ->whereKey($record->getKey())
@@ -168,12 +153,8 @@ class MobileClientController extends Controller
 
         $record->forceFill(['est_actif' => false])->save();
 
-        FicheClient::query()
-            ->where('couturier_id', $user->id)
-            ->where('client_id', $record->id)
-            ->update([
-                'est_actif' => false,
-            ]);
+        // fiche_clients merged into clients table: prestataire owns the client
+        // no separate fiche to update
 
         return response()->json([
             'message' => 'Client archive.',
@@ -214,10 +195,7 @@ class MobileClientController extends Controller
                     ->latest('date_commande')
                     ->limit(6)
                     ->with('modeleVetement'),
-                'fichesClients' => fn ($query) => $query
-                    ->where('couturier_id', $user->id)
-                    ->latest('date_creation')
-                    ->limit(1),
+                // fiche_clients merged into clients table; prestataire is already filtered
             ])
             ->firstOrFail();
     }

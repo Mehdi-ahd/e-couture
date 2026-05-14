@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('type_mesure_id')
                   ->constrained('type_mesures')
                   ->restrictOnDelete();
+            $table->timestamps();
         });
     }
 
