@@ -37,5 +37,6 @@ Route::prefix('mobile')->name('api.mobile.')->group(function () {
         Route::apiResource('type-vetements', MobileTypeVetementController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::apiResource('formes-decoupe', MobileFormeDecoupeController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::apiResource('materiaux', MobileMateriauController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::post('scan', \App\Http\Controllers\Api\Mobile\MobileScanController::class)->name('scan');
     });
 });
