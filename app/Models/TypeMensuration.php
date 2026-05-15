@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TypeMensuration extends BaseModel
 {
+    public $timestamps = false;
     protected $table = 'type_mesures';
 
     protected function casts(): array
