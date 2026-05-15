@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Mobile\MobileClientController;
 use App\Http\Controllers\Api\Mobile\MobileFormeDecoupeController;
 use App\Http\Controllers\Api\Mobile\MobileMateriauController;
 use App\Http\Controllers\Api\Mobile\MobileOnboardingController;
+use App\Http\Controllers\Api\Mobile\MobilePingController;
 use App\Http\Controllers\Api\Mobile\MobilePatternController;
 use App\Http\Controllers\Api\Mobile\MobileTypeVetementController;
 use App\Http\Controllers\Api\Mobile\MobileWorkspaceController;
@@ -27,6 +28,7 @@ Route::prefix('auth')->name('api.auth.')->group(function () {
 });
 
 Route::prefix('mobile')->name('api.mobile.')->group(function () {
+    Route::get('ping', MobilePingController::class)->name('ping');
     Route::post('auth/sync', MobileAuthSyncController::class)->name('auth.sync');
 
     Route::middleware('auth:sanctum')->group(function () {
