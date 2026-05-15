@@ -259,6 +259,7 @@ class MobilePatternController extends Controller
 
         return [
             'external_id' => $pattern->external_id,
+            'model_external_id' => $pattern->modeleVetement?->external_id,
             'title' => $pattern->modeleVetement?->nom ?? 'Patron',
             'description' => $pattern->modeleVetement?->description ?? '',
             'type_vetement_id' => $pattern->modeleVetement?->type_vetement_id,
@@ -278,6 +279,29 @@ class MobilePatternController extends Controller
             'fichier_url' => $pattern->fichier_url,
             'is_editable' => $isEditable,
             'updated_label' => $pattern->created_at?->format('d/m/Y') ?? 'A jour',
+            'model' => [
+                'id' => $pattern->modeleVetement?->id,
+                'external_id' => $pattern->modeleVetement?->external_id,
+                'nom' => $pattern->modeleVetement?->nom,
+                'description' => $pattern->modeleVetement?->description,
+                'portee' => $pattern->modeleVetement?->portee,
+                'statut' => $pattern->modeleVetement?->statut,
+                'prestataire_id' => $pattern->modeleVetement?->prestataire_id,
+                'type_vetement_id' => $pattern->modeleVetement?->type_vetement_id,
+                'created_at' => $pattern->modeleVetement?->created_at?->toISOString(),
+                'updated_at' => $pattern->modeleVetement?->updated_at?->toISOString(),
+            ],
+            'patron' => [
+                'id' => $pattern->id,
+                'external_id' => $pattern->external_id,
+                'methode' => $pattern->methode,
+                'version' => $pattern->version,
+                'fichier_url' => $pattern->fichier_url,
+                'donnees_dessin' => $pattern->donnees_dessin,
+                'statut' => $pattern->statut,
+                'model_vetement_id' => $pattern->model_vetement_id,
+                'created_at' => $pattern->created_at?->toISOString(),
+            ],
         ];
     }
 

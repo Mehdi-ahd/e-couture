@@ -9,41 +9,15 @@ use Filament\Models\Contracts\HasName as FilamentHasName;
 use Filament\Panel;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
-
-#[Fillable([
-    'external_id',
-    'nom',
-    'prenom',
-    'email',
-    'telephone',
-    'password',
-    'est_actif',
-    'type_piece',
-    'kyc_statut',
-    'motif_rejet',
-    'date_soumission',
-    'date_validation',
-    'mobile_onboarding_completed_at',
-    'specialite',
-    'adresse_atelier',
-    'bio',
-    'date_naissance',
-    'notes_personnelles',
-    'last_login_at',
-])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentHasName, FilamentUser, MustVerifyEmailContract
 {
     public const ROLE_ADMINISTRATEUR = 'administrateur';
@@ -61,6 +35,37 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
     use HasRoles;
     use MustVerifyEmail;
     use Notifiable;
+
+    protected $fillable = [
+        'external_id',
+        'nom',
+        'prenom',
+        'email',
+        'telephone',
+        'password',
+        'email_verified_at',
+        'remember_token',
+        'est_actif',
+        'specialite',
+        'adresse_atelier',
+        'bio',
+        'type_piece',
+        'fichier_piece_recto',
+        'fichier_piece_verso',
+        'selfie',
+        'kyc_statut',
+        'motif_rejet',
+        'date_soumission',
+        'date_validation',
+        'mobile_onboarding_completed_at',
+        'date_naissance',
+        'last_login_at',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     protected function casts(): array
     {
@@ -156,6 +161,11 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
     public function getNameAttribute(): string
     {
         return $this->full_name;
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'external_id';
     }
 
     public function getFilamentName(): string
