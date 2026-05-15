@@ -34,6 +34,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'external_id' => (string) Str::uuid(),
             'nom' => fake()->lastName(),
             'prenom' => fake()->firstName(),
             'email' => fake()->unique()->safeEmail(),

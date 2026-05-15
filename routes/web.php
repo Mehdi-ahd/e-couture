@@ -17,5 +17,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/test', function () {
+    return response()->json([
+        'message' => 'ok'
+    ]);
+});
+
 require __DIR__.'/auth.php';
 require __DIR__.'/api.php';

@@ -16,7 +16,7 @@ class CommandeVetementsTable
             ->columns([
                 TextColumn::make('external_id')
                     ->searchable(),
-                TextColumn::make('fiche_client_id')
+                TextColumn::make('client_id')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('modele_vetement_id')
