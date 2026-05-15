@@ -28,27 +28,50 @@ class MobileAuthSyncController extends Controller
 
         /** @var User $user */
         $user = DB::transaction(function () use ($validated): User {
-            $user = User::query()
-                ->where('external_id', $validated['external_id'])
-                ->when(
-                    filled($validated['email'] ?? null),
-                    fn ($query) => $query->orWhere('email', strtolower((string) $validated['email'])),
-                )
-                ->first();
+            $user = null;
+            $external = $validated['external_id'] ?? null;
+            $email = filled($validated['email'] ?? null) ? strtolower((string) $validated['email']) : null;
+
+            // Only treat external_id as UUID when it is a valid UUID
+            if (! empty($external) && Str::isUuid($external)) {
+                $user = User::query()
+                    ->where('external_id', $external)
+                    ->when(filled($email), fn ($query) => $query->orWhere('email', $email))
+                    ->first();
+            }
+
+            // Try to resolve via social_accounts if provider info present
+            if ($user === null && filled($validated['provider'] ?? null) && filled($validated['provider_user_id'] ?? null)) {
+                $social = SocialAccount::query()
+                    ->where('provider', $validated['provider'])
+                    ->where('provider_user_id', $validated['provider_user_id'])
+                    ->first();
+
+                if ($social) {
+                    $user = $social->user;
+                }
+            }
+
+            // Fallback to email lookup
+            if ($user === null && $email !== null) {
+                $user = User::query()->where('email', $email)->first();
+            }
 
             if ($user === null) {
-                $user = new User([
-                    'external_id' => $validated['external_id'],
+                $attrs = [
                     'password' => Hash::make(Str::password(32)),
-                ]);
+                ];
+                if (! empty($external) && Str::isUuid($external)) {
+                    $attrs['external_id'] = $external;
+                }
+
+                $user = new User($attrs);
             }
 
             $user->fill([
                 'prenom' => $validated['prenom'],
                 'nom' => $validated['nom'],
-                'email' => filled($validated['email'] ?? null)
-                    ? strtolower((string) $validated['email'])
-                    : $user->email,
+                'email' => $email ?? $user->email,
                 'telephone' => $validated['telephone'] ?? $user->telephone,
                 'est_actif' => true,
             ]);
@@ -64,7 +87,7 @@ class MobileAuthSyncController extends Controller
 
                 $socialAccount->user()->associate($user);
                 $socialAccount->fill([
-                    'provider_email' => $validated['email'] ?? null,
+                    'provider_data' => ['email' => $email],
                 ]);
                 $socialAccount->save();
             }

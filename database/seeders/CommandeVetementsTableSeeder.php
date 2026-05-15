@@ -18,7 +18,7 @@ class CommandeVetementsTableSeeder extends Seeder
 
             CommandeVetement::query()->create([
                 'client_id' => $client->id,
-                'modele_vetement_id' => 1,
+                'model_vetement_id' => 1,
                 'fiche_mesure_id' => $fiche?->id,
                 'statut' => 'fini',
                 'date_commande' => now()->subDays(rand(1, 200)),

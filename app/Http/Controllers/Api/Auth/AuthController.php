@@ -11,6 +11,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use App\Models\SocialAccount;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -92,6 +96,83 @@ class AuthController extends Controller
                 'user' => $this->userPayload($user->fresh()),
             ],
         ], $status);
+    }
+
+    public function social(Request $request): JsonResponse
+    {
+        $payload = $request->validate([
+            'provider' => ['required', 'string', 'in:google'],
+            'id_token' => ['required_if:provider,google', 'string'],
+            'provider_user_id' => ['sometimes', 'string'],
+            'email' => ['nullable', 'email'],
+            'nom' => ['nullable', 'string'],
+            'prenom' => ['nullable', 'string'],
+            'avatar' => ['nullable', 'string'],
+            'device_name' => ['nullable', 'string'],
+        ]);
+
+        $provider = $payload['provider'];
+        $deviceName = $payload['device_name'] ?? 'mobile-app';
+
+        if ($provider === 'google') {
+            $idToken = $payload['id_token'] ?? null;
+            if (! $idToken) {
+                return response()->json(['message' => 'id_token manquant'], 422);
+            }
+
+            $resp = Http::get('https://oauth2.googleapis.com/tokeninfo', ['id_token' => $idToken]);
+            if ($resp->failed()) {
+                return response()->json(['message' => 'Jeton Google invalide'], 401);
+            }
+
+            $info = $resp->json();
+            $providerUserId = $info['sub'] ?? $payload['provider_user_id'] ?? null;
+            $email = $info['email'] ?? $payload['email'] ?? null;
+            $nom = $info['family_name'] ?? $payload['nom'] ?? null;
+            $prenom = $info['given_name'] ?? $payload['prenom'] ?? null;
+            $avatar = $info['picture'] ?? $payload['avatar'] ?? null;
+        } else {
+            return response()->json(['message' => 'Provider non supporte'], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $social = SocialAccount::query()
+                ->where('provider', $provider)
+                ->where('provider_user_id', $providerUserId)
+                ->first();
+
+            if ($social) {
+                $user = $social->user;
+            } else {
+                $user = User::query()->where('email', $email)->first();
+                if (! $user) {
+                    $user = User::create([
+                        'nom' => $nom ?? null,
+                        'prenom' => $prenom ?? null,
+                        'email' => $email ?? null,
+                        'telephone' => null,
+                        'password' => null,
+                        'est_actif' => true,
+                    ]);
+                    $user->assignApplicationRole(User::ROLE_COUTURIER);
+                }
+
+                SocialAccount::create([
+                    'user_id' => $user->id,
+                    'provider' => $provider,
+                    'provider_user_id' => $providerUserId,
+                    'provider_data' => ['avatar' => $avatar, 'raw' => $info ?? null],
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+        return $this->authenticatedResponse($user, $deviceName);
     }
 
     private function userPayload(User $user): array

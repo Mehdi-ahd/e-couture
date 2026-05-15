@@ -33,11 +33,6 @@ class CommandeVetement extends BaseModel
         return $this->belongsTo(FicheMesure::class, 'fiche_mesure_id');
     }
 
-    public function ficheClient(): BelongsTo
-    {
-        // legacy accessor removed
-        return $this->belongsTo(Client::class, 'client_id');
-    }
 
     public function paiements(): HasMany
     {
