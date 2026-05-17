@@ -11,14 +11,16 @@ return new class extends Migration
         Schema::create('patrons', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->string('methode'); // manuel, genere
-            $table->integer('version')->default(1);
+            $table->foreignUuid('modele_vetement_id')
+                  ->nullable()
+                  ->unique()
+                  ->constrained('modele_vetements')
+                  ->nullOnDelete();
+            $table->string('methode');
+            $table->unsignedInteger('version')->default(1);
             $table->string('fichier_url')->nullable();
-            $table->jsonb('donnees_dessin')->nullable();
-            $table->string('statut')->default('brouillon'); // brouillon, valide, archive
-            $table->foreignId('model_vetement_id')
-                  ->constrained('model_vetements')
-                  ->cascadeOnDelete();
+            $table->json('donnees_dessin')->nullable();
+            $table->string('statut');
             $table->timestamp('created_at')->useCurrent();
         });
     }

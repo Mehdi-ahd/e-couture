@@ -13,7 +13,7 @@ return new class extends Migration
             $table->uuid('external_id')->unique();
             $table->string('code')->unique();
             $table->string('nom');
-            $table->text('description')->nullable();
+            $table->text('description');
             $table->boolean('est_actif')->default(true);
             $table->timestamps();
         });

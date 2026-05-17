@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Mobile;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
-use App\Models\LigneMensuration;
+use App\Models\Mesure;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -42,10 +42,13 @@ class MobileClientController extends Controller
         $validated = $this->validatePayload($request);
 
         $client = Client::query()->create([
-            ...$validated,
+            'nom' => $validated['nom'],
+            'prenom' => $validated['prenom'],
+            'telephone' => $validated['telephone'],
+            'email' => $validated['email'] ?? null,
+            'date_naissance' => $validated['date_naissance'] ?? null,
             'prestataire_id' => $user->id,
-            'date_creation' => now(),
-            'est_actif' => $validated['est_actif'] ?? true,
+            'est_actif' => true,
         ]);
         $client = $this->baseQueryForUser($user)
             ->whereKey($client->getKey())
@@ -65,17 +68,17 @@ class MobileClientController extends Controller
         $user = $request->user();
         $record = $this->findDetailedForUser($user, $client);
         $latestMeasure = $record->fichesMesures->first();
-        $measureLines = $latestMeasure?->lignesMensurations
-            ?->sortBy(fn (LigneMensuration $line) => sprintf(
+        $measureLines = $latestMeasure?->mesures
+            ?->sortBy(fn (Mesure $line) => sprintf(
                 '%02d-%s',
-                $this->measurementCategoryPriority($line->typeMensuration?->categorie),
-                $line->typeMensuration?->nom ?? '',
+                $this->measurementCategoryPriority($line->typeMesure?->categorie),
+                $line->typeMesure?->nom ?? '',
             ))
             ->values()
             ?? collect();
 
         $primaryLines = $measureLines
-            ->filter(fn (LigneMensuration $line) => $this->isPrimaryMeasurementCategory($line->typeMensuration?->categorie))
+            ->filter(fn (Mesure $line) => $this->isPrimaryMeasurementCategory($line->typeMesure?->categorie))
             ->take(4)
             ->values();
 
@@ -85,7 +88,7 @@ class MobileClientController extends Controller
 
         $primaryIds = $primaryLines->pluck('id')->all();
         $secondaryLines = $measureLines
-            ->reject(fn (LigneMensuration $line) => in_array($line->id, $primaryIds, true))
+            ->reject(fn (Mesure $line) => in_array($line->id, $primaryIds, true))
             ->take(6)
             ->values();
 
@@ -98,11 +101,11 @@ class MobileClientController extends Controller
                     'latest_measure_label' => $latestMeasure?->date?->format('d/m/Y') ?? 'Aucune mesure',
                     'measure_status_label' => ucfirst((string) ($latestMeasure?->statut ?? 'nouveau')),
                     'primary_measurements' => $primaryLines
-                        ->map(fn (LigneMensuration $line) => $this->serializeMeasurement($line))
+                        ->map(fn (Mesure $line) => $this->serializeMeasurement($line))
                         ->values()
                         ->all(),
                     'secondary_measurements' => $secondaryLines
-                        ->map(fn (LigneMensuration $line) => $this->serializeMeasurement($line))
+                        ->map(fn (Mesure $line) => $this->serializeMeasurement($line))
                         ->values()
                         ->all(),
                     'history' => $record->commandesVetements
@@ -130,8 +133,7 @@ class MobileClientController extends Controller
 
         $record->fill($validated)->save();
 
-        // fiche_clients merged into clients table: prestataire owns the client
-        // nothing else to update here as est_actif is stored on client
+        // Client record is stored in clients and remains owned by the prestataire.
 
         $record = $this->baseQueryForUser($user)
             ->whereKey($record->getKey())
@@ -153,8 +155,7 @@ class MobileClientController extends Controller
 
         $record->forceFill(['est_actif' => false])->save();
 
-        // fiche_clients merged into clients table: prestataire owns the client
-        // no separate fiche to update
+        // clients are archived instead of deleted
 
         return response()->json([
             'message' => 'Client archive.',
@@ -176,7 +177,7 @@ class MobileClientController extends Controller
     private function findForUser(User $user, string $externalId): Client
     {
         return $this->baseQueryForUser($user)
-            ->where('external_id', $externalId)
+            ->where('id', $externalId)
             ->firstOrFail();
     }
 
@@ -184,18 +185,17 @@ class MobileClientController extends Controller
     {
         return Client::query()
             ->where('prestataire_id', $user->id)
-            ->where('external_id', $externalId)
+            ->where('id', $externalId)
             ->withCount(['fichesMesures', 'commandesVetements'])
             ->with([
                 'fichesMesures' => fn ($query) => $query
                     ->latest('date')
                     ->limit(2)
-                    ->with(['lignesMensurations.typeMensuration']),
+                    ->with(['mesures.typeMesure']),
                 'commandesVetements' => fn ($query) => $query
                     ->latest('date_commande')
                     ->limit(6)
                     ->with('modeleVetement'),
-                // fiche_clients merged into clients table; prestataire is already filtered
             ])
             ->firstOrFail();
     }
@@ -209,9 +209,7 @@ class MobileClientController extends Controller
             'prenom' => [...$required, 'string', 'max:191'],
             'telephone' => [...$required, 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:190'],
-            'genre' => ['nullable', 'string', 'max:40'],
             'date_naissance' => ['nullable', 'date'],
-            'est_actif' => ['sometimes', 'boolean'],
         ]);
     }
 
@@ -221,13 +219,11 @@ class MobileClientController extends Controller
         $latestCommand = $client->commandesVetements->first();
 
         return [
-            'external_id' => $client->external_id,
             'nom' => $client->nom,
             'prenom' => $client->prenom,
             'full_name' => trim($client->prenom.' '.$client->nom),
             'telephone' => $client->telephone,
             'email' => $client->email,
-            'genre' => $client->genre,
             'date_naissance' => $client->date_naissance?->toDateString(),
             'est_actif' => $client->est_actif,
             'measurement_count' => $client->fiches_mesures_count ?? 0,
@@ -249,15 +245,15 @@ class MobileClientController extends Controller
         };
     }
 
-    private function serializeMeasurement(LigneMensuration $line): array
+    private function serializeMeasurement(Mesure $line): array
     {
         return [
             'external_id' => $line->external_id,
-            'label' => $line->typeMensuration?->nom ?? 'Mesure',
-            'code' => $line->typeMensuration?->code ?? '',
-            'category' => $line->typeMensuration?->categorie ?? 'principale',
+            'label' => $line->typeMesure?->nom ?? 'Mesure',
+            'code' => $line->typeMesure?->code ?? '',
+            'category' => $line->typeMesure?->categorie ?? 'principale',
             'value' => (float) $line->valeur,
-            'unit' => $line->typeMensuration?->unite ?? 'cm',
+            'unit' => $line->typeMesure?->unite ?? 'cm',
             'source' => $line->source,
             'confidence' => $line->confiance !== null ? (float) $line->confiance : null,
         ];

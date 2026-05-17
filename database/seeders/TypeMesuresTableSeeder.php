@@ -2,19 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\TypeMensuration;
-use App\Models\ModeleVetement;
+use App\Models\TypeMesure;
 use Illuminate\Database\Seeder;
 
 class TypeMesuresTableSeeder extends Seeder
 {
     public function run(): void
     {
-        $model = ModeleVetement::query()->first();
-        if ($model === null) {
-            return;
-        }
-
         $types = [
             ['code' => 'poitrine', 'nom' => 'Tour de poitrine', 'unite' => 'cm', 'categorie' => 'principale', 'description' => 'Tour de poitrine', 'est_actif' => true],
             ['code' => 'taille', 'nom' => 'Tour de taille', 'unite' => 'cm', 'categorie' => 'principale', 'description' => 'Tour de taille', 'est_actif' => true],
@@ -24,14 +18,13 @@ class TypeMesuresTableSeeder extends Seeder
         ];
 
         foreach ($types as $t) {
-            TypeMensuration::query()->create([
+            TypeMesure::query()->create([
                 'code' => $t['code'],
                 'nom' => $t['nom'],
                 'unite' => $t['unite'],
                 'categorie' => $t['categorie'],
                 'description' => $t['description'],
                 'est_actif' => $t['est_actif'],
-                'model_vetement_id' => $model->id,
             ]);
         }
     }

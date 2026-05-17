@@ -16,21 +16,10 @@ class FicheMesureForm
                 TextInput::make('client_id')
                     ->required()
                     ->numeric(),
-                DatePicker::make('date_prise')
+                DatePicker::make('date')
                     ->required(),
                 TextInput::make('methode')
                     ->required(),
-                TextInput::make('statut_traitement')
-                    ->required()
-                    ->default('EN_ATTENTE'),
-                TextInput::make('traitement_id'),
-                TextInput::make('version_regles')
-                    ->numeric(),
-                Textarea::make('notes')
-                    ->columnSpanFull(),
-                TextInput::make('statut')
-                    ->required()
-                    ->default('BROUILLON'),
             ]);
     }
 }

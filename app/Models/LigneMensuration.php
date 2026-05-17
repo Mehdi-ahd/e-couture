@@ -23,6 +23,6 @@ class LigneMensuration extends BaseModel
 
     public function typeMensuration(): BelongsTo
     {
-        return $this->belongsTo(TypeMensuration::class, 'type_mesure_id');
+        return $this->belongsTo(TypeMesure::class, 'type_mesure_id');
     }
 }

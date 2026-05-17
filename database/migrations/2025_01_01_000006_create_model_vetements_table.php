@@ -8,26 +8,26 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('model_vetements', function (Blueprint $table) {
+        Schema::create('modele_vetements', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->string('nom');
-            $table->text('description');
-            $table->string('portee'); // prive, public, bibliotheque
-            $table->string('statut')->default('brouillon'); // brouillon, publie, archive
-            $table->foreignId('prestataire_id')
+            $table->foreignUuid('prestataire_id')
                   ->nullable()
                   ->constrained('users')
                   ->nullOnDelete();
-            $table->foreignId('type_vetement_id')
+            $table->foreignUuid('type_vetement_id')
                   ->constrained('type_vetements')
                   ->restrictOnDelete();
+            $table->string('nom');
+            $table->text('description');
+            $table->string('portee');
+            $table->string('statut');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('model_vetements');
+        Schema::dropIfExists('modele_vetements');
     }
 };

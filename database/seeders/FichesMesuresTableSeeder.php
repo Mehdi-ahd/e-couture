@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Client;
 use App\Models\FicheMesure;
 use App\Models\LigneMensuration;
-use App\Models\Client;
 use Illuminate\Database\Seeder;
 
 class FichesMesuresTableSeeder extends Seeder
@@ -15,12 +15,9 @@ class FichesMesuresTableSeeder extends Seeder
 
         foreach ($clients as $client) {
             $fiche = FicheMesure::query()->create([
-                'client_id' => $client->id,
-                'prestataire_id' => $client->prestataire_id,
+                'fiche_client_id' => $client->id,
                 'date' => now()->subDays(rand(0, 365)),
-                'statut' => 'valide',
-                'version_regles' => 1,
-                'methode' => "manuelle",
+                'methode' => 'manuelle',
             ]);
 
             // Create a few measurement lines

@@ -11,14 +11,14 @@ return new class extends Migration
         Schema::create('mesure_modeles', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->decimal('valeur', 8, 2);
-            $table->text('notes')->nullable();
-            $table->foreignId('model_vetement_id')
-                  ->constrained('model_vetements')
+            $table->foreignUuid('modele_vetement_id')
+                  ->constrained('modele_vetements')
                   ->cascadeOnDelete();
-            $table->foreignId('type_mesure_id')
+            $table->foreignUuid('type_mesure_id')
                   ->constrained('type_mesures')
                   ->restrictOnDelete();
+            $table->decimal('valeur', 8, 2);
+            $table->text('notes')->nullable();
         });
     }
 

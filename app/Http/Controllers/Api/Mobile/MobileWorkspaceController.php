@@ -76,7 +76,6 @@ class MobileWorkspaceController extends Controller
                     $latestCommand = $client->commandesVetements->first();
 
                     return [
-                        'external_id' => $client->external_id,
                         'name' => trim($client->prenom.' '.$client->nom),
                         'telephone' => $client->telephone,
                         'email' => $client->email,
