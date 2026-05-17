@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::create('mesures', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->foreignUuid('fiche_mesure_id')
+            $table->foreignId('fiche_mesure_id')
                   ->constrained('fiche_mesures')
                   ->cascadeOnDelete();
-            $table->foreignUuid('type_mesure_id')
+            $table->foreignId('type_mesure_id')
                   ->constrained('type_mesures')
                   ->restrictOnDelete();
             $table->decimal('valeur', 8, 2);

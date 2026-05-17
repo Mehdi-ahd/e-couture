@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('regles_proportions', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->foreignUuid('type_mesure_id')
+            $table->foreignId('type_mesure_id')
                   ->constrained('type_mesures')
                   ->restrictOnDelete();
             $table->string('nom');

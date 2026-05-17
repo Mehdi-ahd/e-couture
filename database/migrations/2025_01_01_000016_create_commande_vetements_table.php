@@ -14,10 +14,10 @@ return new class extends Migration
             $table->foreignId('client_id')
                   ->constrained('clients')
                   ->restrictOnDelete();
-            $table->foreignUuid('modele_vetement_id')
+            $table->foreignId('modele_vetement_id')
                   ->constrained('modele_vetements')
                   ->restrictOnDelete();
-            $table->foreignUuid('fiche_mesure_id')
+            $table->foreignId('fiche_mesure_id')
                   ->nullable()
                   ->constrained('fiche_mesures')
                   ->nullOnDelete();
