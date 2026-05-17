@@ -3,33 +3,38 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MesureModele extends BaseModel
+class Mesure extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
-    protected $table = 'mesure_modeles';
+    protected $table = 'mesures';
 
     public $timestamps = false;
 
     protected $fillable = [
-        'modele_vetement_id',
+        'fiche_mesure_id',
         'type_mesure_id',
         'valeur',
-        'notes',
+        'source',
+        'confiance',
+        'commentaire',
     ];
 
     protected function casts(): array
     {
         return [
-            'valeur' => 'decimal:2',
+            'valeur'    => 'decimal:2',
+            'confiance' => 'decimal:4',
         ];
     }
 
-    public function modeleVetement(): BelongsTo
+    public function ficheMesure(): BelongsTo
     {
-        return $this->belongsTo(ModeleVetement::class, 'modele_vetement_id');
+        return $this->belongsTo(FicheMesure::class, 'fiche_mesure_id');
     }
 
     public function typeMesure(): BelongsTo

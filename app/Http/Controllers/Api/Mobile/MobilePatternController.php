@@ -69,7 +69,7 @@ class MobilePatternController extends Controller
             'fichier_url' => $validated['fichier_url'] ?? null,
             'donnees_dessin' => $validated['donnees_dessin'] ?? null,
             'statut' => $validated['statut'] ?? 'brouillon',
-            'model_vetement_id' => $modele->id,
+            'modele_vetement_id' => $modele->id,
         ]);
 
         $pattern = $this->baseQueryForUser($user)
@@ -299,7 +299,7 @@ class MobilePatternController extends Controller
                 'fichier_url' => $pattern->fichier_url,
                 'donnees_dessin' => $pattern->donnees_dessin,
                 'statut' => $pattern->statut,
-                'model_vetement_id' => $pattern->model_vetement_id,
+                'modele_vetement_id' => $pattern->modele_vetement_id,
                 'created_at' => $pattern->created_at?->toISOString(),
             ],
         ];

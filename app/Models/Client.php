@@ -9,6 +9,18 @@ class Client extends BaseModel
 {
     protected $table = 'clients';
 
+    protected $fillable = [
+        'external_id',
+        'nom',
+        'prenom',
+        'telephone',
+        'email',
+        'genre',
+        'date_naissance',
+        'prestataire_id',
+        'est_actif',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -31,5 +43,4 @@ class Client extends BaseModel
     {
         return $this->hasMany(CommandeVetement::class, 'client_id');
     }
-
 }

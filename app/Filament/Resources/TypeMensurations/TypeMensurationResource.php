@@ -7,7 +7,7 @@ use App\Filament\Resources\TypeMensurations\Pages\EditTypeMensuration;
 use App\Filament\Resources\TypeMensurations\Pages\ListTypeMensurations;
 use App\Filament\Resources\TypeMensurations\Schemas\TypeMensurationForm;
 use App\Filament\Resources\TypeMensurations\Tables\TypeMensurationsTable;
-use App\Models\TypeMensuration;
+use App\Models\TypeMesure;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,7 +16,7 @@ use Filament\Tables\Table;
 
 class TypeMensurationResource extends Resource
 {
-    protected static ?string $model = TypeMensuration::class;
+    protected static ?string $model = TypeMesure::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

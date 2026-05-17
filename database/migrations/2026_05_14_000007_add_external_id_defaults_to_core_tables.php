@@ -10,8 +10,8 @@ return new class extends Migration
      */
     private array $tables = [
         'users',
-        'type_vetements',
         'clients',
+        'type_vetements',
         'model_vetements',
         'type_mesures',
         'mesure_modeles',
@@ -26,8 +26,6 @@ return new class extends Migration
         'dispositions_piece_patron',
         'social_accounts',
         'regles_proportions',
-        'paiements',
-        'notes_couturiers',
     ];
 
     public function up(): void

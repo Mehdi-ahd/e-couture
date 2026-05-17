@@ -2,12 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TypeVetement extends BaseModel
 {
+    use HasUuids;
+
     protected $table = 'type_vetements';
+
+    protected $fillable = [
+        'code',
+        'nom',
+        'description',
+        'est_actif',
+    ];
 
     protected function casts(): array
     {

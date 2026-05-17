@@ -2,18 +2,32 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Models\Client;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CommandeVetement extends BaseModel
 {
+    use HasUuids;
+
     protected $table = 'commande_vetements';
+
+    protected $fillable = [
+        'client_id',
+        'modele_vetement_id',
+        'fiche_mesure_id',
+        'statut',
+        'notes',
+        'date_commande',
+        'date_livraison',
+    ];
 
     protected function casts(): array
     {
         return [
-            'date_commande' => 'datetime',
+            'date_commande'  => 'date',
             'date_livraison' => 'date',
         ];
     }
@@ -25,7 +39,7 @@ class CommandeVetement extends BaseModel
 
     public function modeleVetement(): BelongsTo
     {
-        return $this->belongsTo(ModeleVetement::class, 'model_vetement_id');
+        return $this->belongsTo(ModeleVetement::class, 'modele_vetement_id');
     }
 
     public function ficheMesure(): BelongsTo
@@ -33,14 +47,4 @@ class CommandeVetement extends BaseModel
         return $this->belongsTo(FicheMesure::class, 'fiche_mesure_id');
     }
 
-
-    public function paiements(): HasMany
-    {
-        return $this->hasMany(Paiement::class, 'commande_id');
-    }
-
-    public function noteCouturier(): HasOne
-    {
-        return $this->hasOne(NoteCouturier::class, 'commande_id');
-    }
 }

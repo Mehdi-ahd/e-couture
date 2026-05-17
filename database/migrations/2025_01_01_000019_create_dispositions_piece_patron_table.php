@@ -6,52 +6,32 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Placement d'une forme de découpe sur une pièce de patron.
-     * Chaque disposition associe une FormeDecoupe à une PiecePatron avec
-     * sa position, rotation et échelle dans le repère 2D de la pièce.
-     */
     public function up(): void
     {
-        Schema::create('dispositions_piece_patron', function (Blueprint $table) {
+        Schema::create('disposition_piece_patrons', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-
-            // Coordonnées du point d'ancrage de la forme dans le repère de la pièce (unité : mm)
-            $table->double('position_x');
-            $table->double('position_y');
-
-            // Rotation en degrés (0.0 à 360.0)
-            $table->double('rotation')->default(0.0);
-
-            // Facteur d'échelle (1.0 = taille réelle)
-            $table->double('echelle')->default(1.0);
-
-            // Ordre d'affichage / superposition (z-index)
-            $table->integer('ordre')->default(0);
-
-            // Pièce de patron sur laquelle la forme est posée (1..*)
-            $table->foreignId('piece_patron_id')
-                  ->constrained('pieces_patron')
+            $table->foreignUuid('piece_patron_id')
+                  ->constrained('piece_patrons')
                   ->cascadeOnDelete();
-
-            // Forme de découpe appliquée (obligatoire)
-            $table->foreignId('forme_decoupe_id')
+            $table->foreignUuid('forme_decoupe_id')
                   ->constrained('formes_decoupe')
                   ->restrictOnDelete();
-
-            // Matériau associé à cette disposition (optionnel, 0..1)
-            $table->foreignId('materiau_id')
+            $table->foreignUuid('materiau_id')
                   ->nullable()
                   ->constrained('materiaux')
                   ->nullOnDelete();
-
+            $table->decimal('position_x', 10, 4);
+            $table->decimal('position_y', 10, 4);
+            $table->decimal('rotation', 8, 4);
+            $table->decimal('echelle', 8, 4);
+            $table->unsignedInteger('ordre');
             $table->timestamp('created_at')->useCurrent();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('dispositions_piece_patron');
+        Schema::dropIfExists('disposition_piece_patrons');
     }
 };

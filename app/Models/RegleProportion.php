@@ -2,29 +2,39 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RegleProportion extends BaseModel
 {
+    use HasUuids;
+
     protected $table = 'regles_proportions';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'type_mesure_id',
+        'nom',
+        'coefficient',
+        'offset',
+        'source_metier',
+        'version',
+        'est_active',
+    ];
 
     protected function casts(): array
     {
         return [
-            'coefficient' => 'decimal:4',
-            'offset' => 'decimal:2',
-            'version' => 'integer',
-            'est_active' => 'boolean',
+            'coefficient' => 'decimal:6',
+            'offset'      => 'decimal:6',
+            'est_active'  => 'boolean',
+            'created_at'  => 'datetime',
         ];
     }
 
-    public function mensurationSource(): BelongsTo
+    public function typeMesure(): BelongsTo
     {
-        return $this->belongsTo(TypeMensuration::class, 'type_mesure_source_id');
-    }
-
-    public function mensurationCible(): BelongsTo
-    {
-        return $this->belongsTo(TypeMensuration::class, 'type_mesure_cible_id');
+        return $this->belongsTo(TypeMesure::class, 'type_mesure_id');
     }
 }

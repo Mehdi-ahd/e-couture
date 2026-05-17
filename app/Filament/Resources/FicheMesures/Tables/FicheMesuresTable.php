@@ -19,19 +19,10 @@ class FicheMesuresTable
                 TextColumn::make('client_id')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('date_prise')
+                TextColumn::make('date')
                     ->date()
                     ->sortable(),
                 TextColumn::make('methode')
-                    ->searchable(),
-                TextColumn::make('statut_traitement')
-                    ->searchable(),
-                TextColumn::make('traitement_id')
-                    ->searchable(),
-                TextColumn::make('version_regles')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('statut')
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()

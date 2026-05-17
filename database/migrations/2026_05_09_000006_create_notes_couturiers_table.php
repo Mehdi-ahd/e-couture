@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->uuid('external_id')->unique();
             $table->foreignId('client_id')
-                ->constrained('clients')
+                ->constrained('fiche_clients')
                 ->cascadeOnDelete();
             $table->foreignId('couturier_id')
                 ->constrained('users')
