@@ -11,11 +11,11 @@ return new class extends Migration
         Schema::create('modele_vetements', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->foreignUuid('prestataire_id')
+            $table->foreignId('prestataire_id')
                   ->nullable()
                   ->constrained('users')
                   ->nullOnDelete();
-            $table->foreignUuid('type_vetement_id')
+            $table->foreignId('type_vetement_id')
                   ->constrained('type_vetements')
                   ->restrictOnDelete();
             $table->string('nom');

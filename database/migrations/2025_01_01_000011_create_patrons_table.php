@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('patrons', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->foreignUuid('modele_vetement_id')
+            $table->foreignId('modele_vetement_id')
                   ->nullable()
                   ->unique()
                   ->constrained('modele_vetements')

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use App\Models\Client;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CommandeVetement extends BaseModel
 {
-    use HasUuids;
 
     protected $table = 'commande_vetements';
 

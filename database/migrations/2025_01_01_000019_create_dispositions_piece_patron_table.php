@@ -11,13 +11,13 @@ return new class extends Migration
         Schema::create('disposition_piece_patrons', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->foreignUuid('piece_patron_id')
+            $table->foreignId('piece_patron_id')
                   ->constrained('piece_patrons')
                   ->cascadeOnDelete();
-            $table->foreignUuid('forme_decoupe_id')
+            $table->foreignId('forme_decoupe_id')
                   ->constrained('formes_decoupe')
                   ->restrictOnDelete();
-            $table->foreignUuid('materiau_id')
+            $table->foreignId('materiau_id')
                   ->nullable()
                   ->constrained('materiaux')
                   ->nullOnDelete();

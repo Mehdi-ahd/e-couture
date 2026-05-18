@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RegleProportion extends BaseModel
 {
-    use HasUuids;
 
     protected $table = 'regles_proportions';
 

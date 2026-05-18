@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('piece_patrons', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->foreignUuid('patron_id')
+            $table->foreignId('patron_id')
                   ->constrained('patrons')
                   ->cascadeOnDelete();
             $table->string('nom');

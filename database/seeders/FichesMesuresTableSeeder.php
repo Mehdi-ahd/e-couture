@@ -15,7 +15,7 @@ class FichesMesuresTableSeeder extends Seeder
 
         foreach ($clients as $client) {
             $fiche = FicheMesure::query()->create([
-                'fiche_client_id' => $client->id,
+                'client_id' => $client->id,
                 'date' => now()->subDays(rand(0, 365)),
                 'methode' => 'manuelle',
             ]);

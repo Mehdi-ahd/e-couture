@@ -34,7 +34,7 @@ class ClientsTableSeeder extends Seeder
                     'telephone' => sprintf('+22990%06d', 100 + $i),
                     'email' => strtolower($entry['prenom']).'.'.strtolower($entry['nom']).'@example.bj',
                     'prestataire_id' => $prestataire->id,
-                    'est_archive' => false,
+                    'est_actif' => false,
                 ]);
 
                 $i++;
