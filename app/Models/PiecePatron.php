@@ -41,4 +41,9 @@ class PiecePatron extends BaseModel
     {
         return $this->hasMany(DispositionPiecePatron::class, 'piece_patron_id');
     }
+
+    public function dispositions(): HasMany
+    {
+        return $this->dispositionPiecePatrons();
+    }
 }

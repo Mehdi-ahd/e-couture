@@ -46,6 +46,7 @@ class MobileClientController extends Controller
             'prenom' => $validated['prenom'],
             'telephone' => $validated['telephone'],
             'email' => $validated['email'] ?? null,
+            'genre' => $validated['genre'] ?? null,
             'date_naissance' => $validated['date_naissance'] ?? null,
             'prestataire_id' => $user->id,
             'est_actif' => true,
@@ -177,7 +178,7 @@ class MobileClientController extends Controller
     private function findForUser(User $user, string $externalId): Client
     {
         return $this->baseQueryForUser($user)
-            ->where('id', $externalId)
+            ->where('external_id', $externalId)
             ->firstOrFail();
     }
 
@@ -185,7 +186,7 @@ class MobileClientController extends Controller
     {
         return Client::query()
             ->where('prestataire_id', $user->id)
-            ->where('id', $externalId)
+            ->where('external_id', $externalId)
             ->withCount(['fichesMesures', 'commandesVetements'])
             ->with([
                 'fichesMesures' => fn ($query) => $query
@@ -209,6 +210,7 @@ class MobileClientController extends Controller
             'prenom' => [...$required, 'string', 'max:191'],
             'telephone' => [...$required, 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:190'],
+            'genre' => ['nullable', 'string', 'max:30'],
             'date_naissance' => ['nullable', 'date'],
         ]);
     }
@@ -219,13 +221,19 @@ class MobileClientController extends Controller
         $latestCommand = $client->commandesVetements->first();
 
         return [
+            'id' => $client->id,
+            'external_id' => $client->external_id,
             'nom' => $client->nom,
             'prenom' => $client->prenom,
             'full_name' => trim($client->prenom.' '.$client->nom),
             'telephone' => $client->telephone,
             'email' => $client->email,
+            'genre' => $client->genre,
             'date_naissance' => $client->date_naissance?->toDateString(),
             'est_actif' => $client->est_actif,
+            'prestataire_id' => $client->prestataire_id,
+            'created_at' => $client->created_at?->toISOString(),
+            'updated_at' => $client->updated_at?->toISOString(),
             'measurement_count' => $client->fiches_mesures_count ?? 0,
             'order_count' => $client->commandes_vetements_count ?? 0,
             'look_label' => $latestCommand?->modeleVetement?->nom ?? 'Carnet client',
