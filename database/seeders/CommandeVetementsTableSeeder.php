@@ -14,10 +14,10 @@ class CommandeVetementsTableSeeder extends Seeder
         $clients = Client::all();
 
         foreach ($clients as $client) {
-            $fiche = FicheMesure::query()->where('fiche_client_id', $client->id)->first();
+            $fiche = FicheMesure::query()->where('client_id', $client->id)->first();
 
             CommandeVetement::query()->create([
-                'fiche_client_id' => $client->id,
+                'client_id' => $client->id,
                 'modele_vetement_id' => 1,
                 'fiche_mesure_id' => $fiche?->id,
                 'statut' => 'fini',

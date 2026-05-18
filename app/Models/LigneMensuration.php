@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LigneMensuration extends BaseModel
 {
+    public $timestamps = false;
+
     protected $table = 'mesures';
 
     protected function casts(): array
