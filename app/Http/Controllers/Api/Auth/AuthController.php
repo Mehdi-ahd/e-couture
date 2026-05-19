@@ -42,6 +42,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->safe()->only(['email', 'password']);
+        $credentials['email'] = Str::lower((string) ($credentials['email'] ?? ''));
 
         if (! Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
@@ -51,7 +52,6 @@ class AuthController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
-        $user->forceFill(['last_login_at' => now()])->save();
 
         return $this->authenticatedResponse(
             $user,
@@ -67,6 +67,7 @@ class AuthController extends Controller
         return response()->json([
             'data' => [
                 'user' => $this->userPayload($user),
+                'needs_onboarding' => $user->mobile_onboarding_completed_at === null,
             ],
         ]);
     }
@@ -86,14 +87,17 @@ class AuthController extends Controller
 
     private function authenticatedResponse(User $user, string $deviceName, int $status = 200): JsonResponse
     {
+        $user->forceFill(['last_login_at' => now()])->save();
         $token = $user->createToken($deviceName);
+        $freshUser = $user->fresh();
 
         return response()->json([
             'message' => 'Authentification reussie.',
             'data' => [
                 'token' => $token->plainTextToken,
                 'token_type' => 'Bearer',
-                'user' => $this->userPayload($user->fresh()),
+                'user' => $this->userPayload($freshUser),
+                'needs_onboarding' => $freshUser?->mobile_onboarding_completed_at === null,
             ],
         ], $status);
     }
@@ -108,11 +112,12 @@ class AuthController extends Controller
             'nom' => ['nullable', 'string'],
             'prenom' => ['nullable', 'string'],
             'avatar' => ['nullable', 'string'],
-            'device_name' => ['nullable', 'string'],
+            'device_name' => ['nullable', 'string', 'max:120'],
         ]);
 
         $provider = $payload['provider'];
         $deviceName = $payload['device_name'] ?? 'mobile-app';
+        $info = [];
 
         if ($provider === 'google') {
             $idToken = $payload['id_token'] ?? null;
@@ -135,6 +140,14 @@ class AuthController extends Controller
             return response()->json(['message' => 'Provider non supporte'], 422);
         }
 
+        if (! filled($providerUserId)) {
+            return response()->json(['message' => 'Identifiant Google introuvable.'], 422);
+        }
+
+        $email = filled($email ?? null) ? Str::lower((string) $email) : null;
+        $prenom = filled($prenom ?? null) ? trim((string) $prenom) : 'Utilisateur';
+        $nom = filled($nom ?? null) ? trim((string) $nom) : 'E-Couture';
+
         DB::beginTransaction();
         try {
             $social = SocialAccount::query()
@@ -145,15 +158,24 @@ class AuthController extends Controller
             if ($social) {
                 $user = $social->user;
             } else {
-                $user = User::query()->where('email', $email)->first();
+                $user = User::query()
+                    ->when(
+                        filled($email),
+                        fn ($query) => $query->where('email', $email),
+                        fn ($query) => $query->whereRaw('1 = 0'),
+                    )
+                    ->first();
                 if (! $user) {
                     $user = User::create([
-                        'nom' => $nom ?? null,
-                        'prenom' => $prenom ?? null,
-                        'email' => $email ?? null,
+                        'nom' => $nom,
+                        'prenom' => $prenom,
+                        'email' => $email,
                         'telephone' => null,
-                        'password' => null,
+                        'password' => Hash::make(Str::password(32)),
                         'est_actif' => true,
+                        'email_verified_at' => filter_var($info['email_verified'] ?? false, FILTER_VALIDATE_BOOLEAN)
+                            ? now()
+                            : null,
                     ]);
                     $user->assignApplicationRole(User::ROLE_COUTURIER);
                 }
@@ -162,7 +184,8 @@ class AuthController extends Controller
                     'user_id' => $user->id,
                     'provider' => $provider,
                     'provider_user_id' => $providerUserId,
-                    'provider_data' => ['avatar' => $avatar, 'raw' => $info ?? null],
+                    'provider_email' => $email,
+                    'provider_avatar_url' => $avatar,
                 ]);
             }
 
