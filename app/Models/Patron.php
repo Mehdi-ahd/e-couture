@@ -38,4 +38,12 @@ class Patron extends BaseModel
     {
         return $this->hasMany(PiecePatron::class, 'patron_id');
     }
+
+    /**
+     * Backward-compatible alias used by mobile controllers/serializers.
+     */
+    public function piecesPatrons(): HasMany
+    {
+        return $this->piecePatrons();
+    }
 }

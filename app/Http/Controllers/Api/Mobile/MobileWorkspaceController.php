@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Mobile;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\CommandeVetement;
+use App\Models\FicheMesure;
 use App\Models\Patron;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -22,12 +23,10 @@ class MobileWorkspaceController extends Controller
             ->where('est_actif', true)
             ->count();
 
-        $pendingMeasurementCount = $user->fichesMesures()
-            ->where(function ($query): void {
-                $query
-                    ->whereIn('statut', ['brouillon', 'archive'])
-                    ->orWhere('statut_traitement', 'en_attente');
-            })
+        $pendingMeasurementCount = Client::query()
+            ->where('prestataire_id', $user->id)
+            ->where('est_actif', true)
+            ->doesntHave('fichesMesures')
             ->count();
 
         $patternsQuery = Patron::query()
@@ -80,7 +79,7 @@ class MobileWorkspaceController extends Controller
                         'telephone' => $client->telephone,
                         'email' => $client->email,
                         'look_label' => $latestCommand?->modeleVetement?->nom ?? 'Carnet client',
-                        'next_action' => $this->resolveNextAction($latestMeasure?->statut),
+                        'next_action' => $this->resolveNextAction($latestMeasure, $latestCommand),
                         'last_visit_label' => $latestMeasure?->date?->format('d/m') ?? 'Nouveau',
                     ];
                 })->values()->all(),
@@ -118,14 +117,17 @@ class MobileWorkspaceController extends Controller
         ]);
     }
 
-    private function resolveNextAction(?string $status): string
+    private function resolveNextAction(?FicheMesure $latestMeasure, ?CommandeVetement $latestCommand): string
     {
-        return match ($status) {
-            'valide' => 'Ouvrir le patron',
-            'archive' => 'Reprendre le dossier',
-            'brouillon' => 'Verifier les mesures',
-            default => 'Prendre les mesures',
-        };
+        if ($latestMeasure === null) {
+            return 'Prendre les mesures';
+        }
+
+        if ($latestCommand !== null) {
+            return 'Suivre la commande';
+        }
+
+        return 'Ouvrir le dossier';
     }
 
     private function mapStatusTone(string $status): string
