@@ -73,8 +73,10 @@ class MobilePatternPieceController extends Controller
                         ->sortBy('ordre')
                         ->map(fn ($disposition) => [
                             'external_id' => $disposition->external_id,
+                            'forme_decoupe_id' => $disposition->forme_decoupe_id,
                             'ordre' => $disposition->ordre,
                             'forme_label' => $disposition->formeDecoupe?->nom ?? 'Forme',
+                            'materiau_id' => $disposition->materiau_id,
                             'materiau_label' => $disposition->materiau?->nom ?? 'Sans matériau',
                             'position_x' => (double) $disposition->position_x,
                             'position_y' => (double) $disposition->position_y,

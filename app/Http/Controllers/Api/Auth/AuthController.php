@@ -7,12 +7,13 @@ use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\SocialAccount;
 use Illuminate\Validation\ValidationException;
@@ -125,7 +126,16 @@ class AuthController extends Controller
                 return response()->json(['message' => 'id_token manquant'], 422);
             }
 
-            $resp = Http::get('https://oauth2.googleapis.com/tokeninfo', ['id_token' => $idToken]);
+            try {
+                $resp = Http::acceptJson()
+                    ->timeout(8)
+                    ->get('https://oauth2.googleapis.com/tokeninfo', ['id_token' => $idToken]);
+            } catch (ConnectionException) {
+                return response()->json([
+                    'message' => 'Le service Google est temporairement indisponible.',
+                ], 503);
+            }
+
             if ($resp->failed()) {
                 return response()->json(['message' => 'Jeton Google invalide'], 401);
             }
@@ -156,6 +166,10 @@ class AuthController extends Controller
                 ->first();
 
             if ($social) {
+                $social->fill([
+                    'provider_email' => $email,
+                    'provider_avatar_url' => $avatar,
+                ])->save();
                 $user = $social->user;
             } else {
                 $user = User::query()
