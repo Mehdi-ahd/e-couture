@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MesureModele extends BaseModel
 {
-
     protected $table = 'mesure_modeles';
 
     public $timestamps = false;

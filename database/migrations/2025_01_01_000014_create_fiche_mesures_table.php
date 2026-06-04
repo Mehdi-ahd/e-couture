@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
             $table->uuid('external_id')->unique();
             $table->foreignId('client_id')
-                  ->constrained('clients')
-                  ->cascadeOnDelete();
+                ->constrained('clients')
+                ->cascadeOnDelete();
             $table->date('date');
             $table->string('methode');
             $table->timestamps();

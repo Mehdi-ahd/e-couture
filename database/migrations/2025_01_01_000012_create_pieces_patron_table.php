@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
             $table->uuid('external_id')->unique();
             $table->foreignId('patron_id')
-                  ->constrained('patrons')
-                  ->cascadeOnDelete();
+                ->constrained('patrons')
+                ->cascadeOnDelete();
             $table->string('nom');
             $table->unsignedInteger('ordre');
             $table->json('donnees_geometriques');

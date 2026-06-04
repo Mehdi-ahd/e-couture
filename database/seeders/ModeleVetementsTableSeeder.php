@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\ModeleVetement;
 use App\Models\Materiau;
+use App\Models\ModeleVetement;
 use App\Models\TypeVetement;
 use App\Models\User;
 use Illuminate\Database\Seeder;

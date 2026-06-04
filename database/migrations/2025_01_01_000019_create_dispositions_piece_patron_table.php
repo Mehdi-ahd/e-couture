@@ -12,15 +12,15 @@ return new class extends Migration
             $table->id();
             $table->uuid('external_id')->unique();
             $table->foreignId('piece_patron_id')
-                  ->constrained('piece_patrons')
-                  ->cascadeOnDelete();
+                ->constrained('piece_patrons')
+                ->cascadeOnDelete();
             $table->foreignId('forme_decoupe_id')
-                  ->constrained('formes_decoupe')
-                  ->restrictOnDelete();
+                ->constrained('formes_decoupe')
+                ->restrictOnDelete();
             $table->foreignId('materiau_id')
-                  ->nullable()
-                  ->constrained('materiaux')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('materiaux')
+                ->nullOnDelete();
             $table->decimal('position_x', 10, 4);
             $table->decimal('position_y', 10, 4);
             $table->decimal('rotation', 8, 4);

@@ -78,10 +78,10 @@ class MobilePatternPieceController extends Controller
                             'forme_label' => $disposition->formeDecoupe?->nom ?? 'Forme',
                             'materiau_id' => $disposition->materiau_id,
                             'materiau_label' => $disposition->materiau?->nom ?? 'Sans matériau',
-                            'position_x' => (double) $disposition->position_x,
-                            'position_y' => (double) $disposition->position_y,
-                            'rotation' => (double) $disposition->rotation,
-                            'echelle' => (double) $disposition->echelle,
+                            'position_x' => (float) $disposition->position_x,
+                            'position_y' => (float) $disposition->position_y,
+                            'rotation' => (float) $disposition->rotation,
+                            'echelle' => (float) $disposition->echelle,
                         ])
                         ->values()
                         ->all(),

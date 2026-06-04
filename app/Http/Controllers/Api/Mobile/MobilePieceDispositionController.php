@@ -172,10 +172,10 @@ class MobilePieceDispositionController extends Controller
             'forme_label' => $item->formeDecoupe?->nom ?? 'Forme',
             'materiau_id' => $item->materiau_id,
             'materiau_label' => $item->materiau?->nom ?? 'Sans matériau',
-            'position_x' => (double) $item->position_x,
-            'position_y' => (double) $item->position_y,
-            'rotation' => (double) $item->rotation,
-            'echelle' => (double) $item->echelle,
+            'position_x' => (float) $item->position_x,
+            'position_y' => (float) $item->position_y,
+            'rotation' => (float) $item->rotation,
+            'echelle' => (float) $item->echelle,
             'ordre' => $item->ordre,
         ];
     }

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AnnotationPatron extends BaseModel
 {
-
     protected $table = 'annotation_patrons';
 
     public $timestamps = false;

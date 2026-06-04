@@ -12,12 +12,12 @@ return new class extends Migration
             $table->id();
             $table->uuid('external_id')->unique();
             $table->foreignId('prestataire_id')
-                  ->nullable()
-                  ->constrained('users')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
             $table->foreignId('type_vetement_id')
-                  ->constrained('type_vetements')
-                  ->restrictOnDelete();
+                ->constrained('type_vetements')
+                ->restrictOnDelete();
             $table->string('nom');
             $table->text('description');
             $table->string('portee');

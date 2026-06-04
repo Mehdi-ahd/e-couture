@@ -12,11 +12,11 @@ return new class extends Migration
             $table->id();
             $table->uuid('external_id')->unique();
             $table->foreignId('modele_vetement_id')
-                  ->constrained('modele_vetements')
-                  ->cascadeOnDelete();
+                ->constrained('modele_vetements')
+                ->cascadeOnDelete();
             $table->foreignId('type_mesure_id')
-                  ->constrained('type_mesures')
-                  ->restrictOnDelete();
+                ->constrained('type_mesures')
+                ->restrictOnDelete();
             $table->decimal('valeur', 8, 2);
             $table->text('notes')->nullable();
         });

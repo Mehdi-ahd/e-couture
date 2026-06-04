@@ -30,8 +30,7 @@ class MobileClientController extends Controller
                     'pending_measurements' => $clients
                         ->where('est_actif', true)
                         ->filter(
-                            fn (Client $client) =>
-                                $this->resolveMeasurementStatus($client->fichesMesures->first()) !== 'valide',
+                            fn (Client $client) => $this->resolveMeasurementStatus($client->fichesMesures->first()) !== 'valide',
                         )
                         ->count(),
                 ],

@@ -17,6 +17,7 @@
         "laravel/socialite": "^5.26",
         "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.32",
+        "mtownsend/remove-bg": "^2.0",
         "propaganistas/laravel-phone": "^6.0",
         "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-medialibrary": "^11.21",

@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Patron extends BaseModel
 {
-
     protected $table = 'patrons';
 
     public $timestamps = false;
@@ -25,7 +24,7 @@ class Patron extends BaseModel
     {
         return [
             'donnees_dessin' => 'array',
-            'created_at'     => 'datetime',
+            'created_at' => 'datetime',
         ];
     }
 

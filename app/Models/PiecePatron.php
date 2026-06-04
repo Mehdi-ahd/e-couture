@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PiecePatron extends BaseModel
 {
-
     protected $table = 'piece_patrons';
 
     public $timestamps = false;

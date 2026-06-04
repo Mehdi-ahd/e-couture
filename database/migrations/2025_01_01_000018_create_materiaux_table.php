@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('image_url')->nullable();
             $table->boolean('est_global')->default(false);
             $table->foreignId('forme_decoupe_id')
-                  ->nullable()
-                  ->constrained('formes_decoupe')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('formes_decoupe')
+                ->nullOnDelete();
             $table->timestamp('created_at')->useCurrent();
         });
     }

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\CommandeVetement;
 use App\Models\Client;
+use App\Models\CommandeVetement;
 use App\Models\FicheMesure;
 use App\Models\ModeleVetement;
 use Illuminate\Database\Seeder;

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RegleProportion extends BaseModel
 {
-
     protected $table = 'regles_proportions';
 
     public $timestamps = false;
@@ -25,9 +24,9 @@ class RegleProportion extends BaseModel
     {
         return [
             'coefficient' => 'decimal:6',
-            'offset'      => 'decimal:6',
-            'est_active'  => 'boolean',
-            'created_at'  => 'datetime',
+            'offset' => 'decimal:6',
+            'est_active' => 'boolean',
+            'created_at' => 'datetime',
         ];
     }
 

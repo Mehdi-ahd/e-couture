@@ -21,8 +21,8 @@ return new class extends Migration
             $table->timestamp('date_creation')->useCurrent();
             $table->boolean('est_actif')->default(true);
             $table->foreignId('prestataire_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->constrained('users')
+                ->cascadeOnDelete();
             $table->softDeletes();
             $table->index(['prestataire_id', 'est_actif'], 'idx_clients_prestataire');
             $table->timestamps();

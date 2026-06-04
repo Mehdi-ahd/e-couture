@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FicheMesure extends BaseModel
 {
-
     protected $table = 'fiche_mesures';
 
     protected $fillable = [
