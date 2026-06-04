@@ -8,20 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('pieces_patron', function (Blueprint $table) {
+        Schema::create('piece_patrons', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->string('nom');
-            $table->integer('ordre');
-            $table->jsonb('donnees_geometriques');
             $table->foreignId('patron_id')
-                  ->constrained('patrons')
-                  ->cascadeOnDelete();
+                ->constrained('patrons')
+                ->cascadeOnDelete();
+            $table->string('nom');
+            $table->unsignedInteger('ordre');
+            $table->json('donnees_geometriques');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('pieces_patron');
+        Schema::dropIfExists('piece_patrons');
     }
 };

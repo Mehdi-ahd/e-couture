@@ -11,24 +11,16 @@ return new class extends Migration
         Schema::create('regles_proportions', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
+            $table->foreignId('type_mesure_id')
+                ->constrained('type_mesures')
+                ->restrictOnDelete();
             $table->string('nom');
-            $table->foreignId('type_mesure_source_id')
-                ->constrained('type_mesures')
-                ->restrictOnDelete();
-            $table->foreignId('type_mesure_cible_id')
-                ->constrained('type_mesures')
-                ->restrictOnDelete();
-            $table->decimal('coefficient', 8, 4);
-            $table->decimal('offset', 8, 2)->default(0);
-            $table->string('source_metier')->nullable();
-            $table->unsignedSmallInteger('version')->default(1);
+            $table->decimal('coefficient', 10, 6);
+            $table->decimal('offset', 10, 6);
+            $table->string('source_metier');
+            $table->unsignedInteger('version')->default(1);
             $table->boolean('est_active')->default(true);
-            $table->timestamps();
-
-            $table->unique(
-                ['type_mesure_source_id', 'type_mesure_cible_id', 'version'],
-                'uniq_regles_proportions_mesures_version',
-            );
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 

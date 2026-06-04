@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('telephone', 20)->nullable()->unique();
             $table->string('password');
             $table->timestamp('email_verified_at')->nullable();
-            
+
             $table->boolean('est_actif')->default(true);
 
             $table->string('specialite')->nullable();

@@ -4,9 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MensurationModele extends BaseModel
+class MesureModele extends BaseModel
 {
     protected $table = 'mesure_modeles';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'modele_vetement_id',
+        'type_mesure_id',
+        'valeur',
+        'notes',
+    ];
 
     protected function casts(): array
     {
@@ -17,11 +26,11 @@ class MensurationModele extends BaseModel
 
     public function modeleVetement(): BelongsTo
     {
-        return $this->belongsTo(ModeleVetement::class, 'model_vetement_id');
+        return $this->belongsTo(ModeleVetement::class, 'modele_vetement_id');
     }
 
-    public function typeMensuration(): BelongsTo
+    public function typeMesure(): BelongsTo
     {
-        return $this->belongsTo(TypeMensuration::class, 'type_mesure_id');
+        return $this->belongsTo(TypeMesure::class, 'type_mesure_id');
     }
 }

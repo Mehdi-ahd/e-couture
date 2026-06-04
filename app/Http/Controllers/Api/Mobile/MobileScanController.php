@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api\Mobile;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -12,7 +13,7 @@ class MobileScanController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
     {
-        /** @var \Illuminate\Contracts\Auth\Authenticatable|null $user */
+        /** @var Authenticatable|null $user */
         $user = $request->user();
 
         $validated = $request->validate([

@@ -9,10 +9,22 @@ class Materiau extends BaseModel
 {
     protected $table = 'materiaux';
 
+    public $timestamps = false;
+
+    protected $fillable = [
+        'nom',
+        'description',
+        'type',
+        'image_url',
+        'est_global',
+        'forme_decoupe_id',
+    ];
+
     protected function casts(): array
     {
         return [
             'est_global' => 'boolean',
+            'created_at' => 'datetime',
         ];
     }
 
@@ -21,7 +33,7 @@ class Materiau extends BaseModel
         return $this->belongsTo(FormeDecoupe::class, 'forme_decoupe_id');
     }
 
-    public function dispositionsPiecePatron(): HasMany
+    public function dispositionPiecePatrons(): HasMany
     {
         return $this->hasMany(DispositionPiecePatron::class, 'materiau_id');
     }

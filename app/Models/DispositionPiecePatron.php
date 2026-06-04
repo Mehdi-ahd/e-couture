@@ -6,16 +6,29 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DispositionPiecePatron extends BaseModel
 {
-    protected $table = 'dispositions_piece_patron';
+    protected $table = 'disposition_piece_patrons';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'piece_patron_id',
+        'forme_decoupe_id',
+        'materiau_id',
+        'position_x',
+        'position_y',
+        'rotation',
+        'echelle',
+        'ordre',
+    ];
 
     protected function casts(): array
     {
         return [
-            'position_x' => 'float',
-            'position_y' => 'float',
-            'rotation' => 'float',
-            'echelle' => 'float',
-            'ordre' => 'integer',
+            'position_x' => 'decimal:4',
+            'position_y' => 'decimal:4',
+            'rotation' => 'decimal:4',
+            'echelle' => 'decimal:4',
+            'created_at' => 'datetime',
         ];
     }
 

@@ -28,15 +28,19 @@ class ClientsTableSeeder extends Seeder
         foreach ($prestataires as $prestataire) {
             for ($n = 0; $n < 2; $n++) {
                 $entry = $beninClients[$i % count($beninClients)];
-                Client::query()->create([
-                    'nom' => $entry['nom'],
-                    'prenom' => $entry['prenom'],
-                    'telephone' => sprintf('+22990%06d', 100 + $i),
-                    'email' => strtolower($entry['prenom']).'.'.strtolower($entry['nom']).'@example.bj',
-                    'genre' => $n % 2 == 0 ? 'femme' : 'homme',
-                    'est_actif' => true,
-                    'prestataire_id' => $prestataire->id,
-                ]);
+                Client::query()->updateOrCreate(
+                    [
+                        'telephone' => sprintf('+22990%06d', 100 + $i),
+                    ],
+                    [
+                        'nom' => $entry['nom'],
+                        'prenom' => $entry['prenom'],
+                        'email' => strtolower($entry['prenom']).'.'.strtolower($entry['nom']).'@example.bj',
+                        'prestataire_id' => $prestataire->id,
+                        'genre' => $i % 2 === 0 ? 'feminin' : 'masculin',
+                        'est_actif' => true,
+                    ],
+                );
 
                 $i++;
             }

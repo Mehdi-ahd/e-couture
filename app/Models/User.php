@@ -12,12 +12,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
+
 class User extends Authenticatable implements FilamentHasName, FilamentUser, MustVerifyEmailContract
 {
     public const ROLE_ADMINISTRATEUR = 'administrateur';
@@ -96,9 +98,16 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
         return $this->hasMany(SocialAccount::class);
     }
 
-    public function fichesMesures(): HasMany
+    public function fichesMesures(): HasManyThrough
     {
-        return $this->hasMany(FicheMesure::class, 'prestataire_id');
+        return $this->hasManyThrough(
+            FicheMesure::class,
+            Client::class,
+            'prestataire_id',
+            'client_id',
+            'id',
+            'id',
+        );
     }
 
     public function modelesVetementsCrees(): HasMany

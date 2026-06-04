@@ -11,19 +11,11 @@ return new class extends Migration
         Schema::create('fiche_mesures', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->date('date');
-            $table->string('methode'); // manuelle, ia_assistee
-            $table->string('statut_traitement')->default('en_attente'); // en_attente, traite, echec
-            $table->string('traitement_id')->nullable();
-            $table->integer('version_regles')->default(1);
-            $table->text('notes')->nullable();
-            $table->string('statut')->default('brouillon'); // brouillon, valide, archive
             $table->foreignId('client_id')
-                  ->constrained('clients')
-                  ->cascadeOnDelete();
-            $table->foreignId('prestataire_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->constrained('clients')
+                ->cascadeOnDelete();
+            $table->date('date');
+            $table->string('methode');
             $table->timestamps();
         });
     }

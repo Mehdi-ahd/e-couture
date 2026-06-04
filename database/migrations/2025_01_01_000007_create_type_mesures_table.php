@@ -13,13 +13,10 @@ return new class extends Migration
             $table->uuid('external_id')->unique();
             $table->string('code')->unique();
             $table->string('nom');
-            $table->string('unite'); // cm, mm, etc.
-            $table->string('categorie'); // principale, secondaire, etc.
-            $table->text('description')->nullable();
+            $table->string('unite');
+            $table->string('categorie');
+            $table->text('description');
             $table->boolean('est_actif')->default(true);
-            $table->foreignId('model_vetement_id')
-                  ->constrained('model_vetements')
-                  ->cascadeOnDelete();
         });
     }
 

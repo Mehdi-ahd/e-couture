@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LigneMensuration extends BaseModel
 {
+    public $timestamps = false;
+
     protected $table = 'mesures';
 
     protected function casts(): array
@@ -23,6 +25,6 @@ class LigneMensuration extends BaseModel
 
     public function typeMensuration(): BelongsTo
     {
-        return $this->belongsTo(TypeMensuration::class, 'type_mesure_id');
+        return $this->belongsTo(TypeMesure::class, 'type_mesure_id');
     }
 }

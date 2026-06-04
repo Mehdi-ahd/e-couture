@@ -9,21 +9,40 @@ class Patron extends BaseModel
 {
     protected $table = 'patrons';
 
+    public $timestamps = false;
+
+    protected $fillable = [
+        'modele_vetement_id',
+        'methode',
+        'version',
+        'fichier_url',
+        'donnees_dessin',
+        'statut',
+    ];
+
     protected function casts(): array
     {
         return [
-            'version' => 'integer',
             'donnees_dessin' => 'array',
+            'created_at' => 'datetime',
         ];
     }
 
     public function modeleVetement(): BelongsTo
     {
-        return $this->belongsTo(ModeleVetement::class, 'model_vetement_id');
+        return $this->belongsTo(ModeleVetement::class, 'modele_vetement_id');
     }
 
-    public function piecesPatrons(): HasMany
+    public function piecePatrons(): HasMany
     {
         return $this->hasMany(PiecePatron::class, 'patron_id');
+    }
+
+    /**
+     * Backward-compatible alias used by mobile controllers/serializers.
+     */
+    public function piecesPatrons(): HasMany
+    {
+        return $this->piecePatrons();
     }
 }

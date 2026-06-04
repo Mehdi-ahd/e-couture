@@ -11,26 +11,22 @@ return new class extends Migration
         Schema::create('commande_vetements', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
-            $table->string('statut')->default('en_attente'); // en_attente, en_coupe, en_cours, fini, livre
+            $table->foreignId('client_id')
+                ->constrained('clients')
+                ->restrictOnDelete();
+            $table->foreignId('modele_vetement_id')
+                ->constrained('modele_vetements')
+                ->restrictOnDelete();
+            $table->foreignId('fiche_mesure_id')
+                ->nullable()
+                ->constrained('fiche_mesures')
+                ->nullOnDelete();
+            $table->string('statut');
             $table->text('notes')->nullable();
             $table->date('date_commande');
             $table->date('date_livraison')->nullable();
-
-            $table->foreignId('client_id')
-                  ->constrained('clients')
-                  ->restrictOnDelete();
-
-            $table->foreignId('model_vetement_id')
-                  ->constrained('model_vetements')
-                  ->restrictOnDelete();
-
-            // Nullable : une commande peut référencer 0 ou 1 fiche de mesures (0..1)
-            $table->foreignId('fiche_mesure_id')
-                  ->nullable()
-                  ->constrained('fiche_mesures')
-                  ->nullOnDelete();
-
-            $table->timestamps();
+            $table->timestamp('updated_at')->nullable();
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 
