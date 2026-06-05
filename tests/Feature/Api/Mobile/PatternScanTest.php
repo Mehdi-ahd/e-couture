@@ -221,7 +221,7 @@ it('returns gateway error response when gateway throws exception', function () {
         ])
         ->assertStatus(503)
         ->assertJson([
-            'message' => 'Pattern cutout failed.',
+            'message' => 'Échec du traitement du scan.',
             'error' => [
                 'code' => 'REMOVE_BG_GATEWAY_ERROR',
                 'retryable' => true,
