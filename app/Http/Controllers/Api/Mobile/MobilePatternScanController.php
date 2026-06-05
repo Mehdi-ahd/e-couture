@@ -8,6 +8,7 @@ use App\Http\Requests\Api\Mobile\PatternScanRequest;
 use App\Http\Resources\Api\Mobile\ScanResultResource;
 use App\Services\Scan\RemoveBgPatternGateway;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -23,8 +24,15 @@ class MobilePatternScanController extends Controller
                 $request->options(),
             );
         } catch (RemoveBgPatternGatewayException $exception) {
+            Log::warning('pattern_scan.failed', [
+                'detail' => $exception->getMessage(),
+                'status' => $exception->statusCode,
+                'context' => $exception->context,
+                'user_id' => $request->user()?->id,
+            ]);
+
             return response()->json([
-                'message' => 'Pattern cutout failed.',
+                'message' => 'Échec du traitement du scan.',
                 'error' => [
                     'code' => 'REMOVE_BG_GATEWAY_ERROR',
                     'detail' => $exception->getMessage(),
