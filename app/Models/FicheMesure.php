@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class FicheMesure extends BaseModel
+class FicheMesure extends BaseModel implements HasMedia
 {
+    use InteractsWithMedia;
+
     protected $table = 'fiche_mesures';
 
     protected $fillable = [
@@ -30,5 +34,18 @@ class FicheMesure extends BaseModel
     public function mesures(): HasMany
     {
         return $this->hasMany(Mesure::class, 'fiche_mesure_id');
+    }
+
+    // Collections Spatie — une par vue
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('face')
+             ->singleFile();   // max 1 photo par vue
+
+        $this->addMediaCollection('dos')
+             ->singleFile();
+
+        $this->addMediaCollection('profil')
+             ->singleFile();
     }
 }
