@@ -40,12 +40,12 @@ class FicheMesure extends BaseModel implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('face')
-             ->singleFile();   // max 1 photo par vue
+            ->singleFile();   // max 1 photo par vue
 
         $this->addMediaCollection('dos')
-             ->singleFile();
+            ->singleFile();
 
         $this->addMediaCollection('profil')
-             ->singleFile();
+            ->singleFile();
     }
 }

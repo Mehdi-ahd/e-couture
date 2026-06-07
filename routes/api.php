@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Auth\SocialAuthController;
 use App\Http\Controllers\Api\Mobile\MobileAuthSyncController;
 use App\Http\Controllers\Api\Mobile\MobileClientController;
 use App\Http\Controllers\Api\Mobile\MobileFormeDecoupeController;
+use App\Http\Controllers\Api\Mobile\MobileGuidedMeasurementSheetController;
 use App\Http\Controllers\Api\Mobile\MobileMateriauController;
 use App\Http\Controllers\Api\Mobile\MobileMeasurementSheetController;
 use App\Http\Controllers\Api\Mobile\MobileOnboardingController;
@@ -46,6 +47,8 @@ Route::prefix('mobile')->name('api.mobile.')->group(function () {
         Route::apiResource('clients.measurement-sheets', MobileMeasurementSheetController::class)
             ->parameters(['clients' => 'client', 'measurement-sheets' => 'sheet'])
             ->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::post('clients/{client}/guided-measurement-sheets', [MobileGuidedMeasurementSheetController::class, 'store'])->name('clients.guided-measurement-sheets.store');
+        Route::get('clients/{client}/guided-measurement-sheets/{sheet}', [MobileGuidedMeasurementSheetController::class, 'show'])->name('clients.guided-measurement-sheets.show');
         Route::apiResource('clients.orders', MobileOrderController::class)
             ->parameters(['clients' => 'client', 'orders' => 'order'])
             ->only(['index', 'store', 'show', 'update', 'destroy']);

@@ -10,15 +10,22 @@ class TypeMesuresTableSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            ['code' => 'poitrine', 'nom' => 'Tour de poitrine', 'unite' => 'cm', 'categorie' => 'principale', 'description' => 'Mesure clé pour robes, chemises et vestes.', 'est_actif' => true],
-            ['code' => 'taille', 'nom' => 'Tour de taille', 'unite' => 'cm', 'categorie' => 'principale', 'description' => 'Mesure centrale pour robes, jupes et pantalons.', 'est_actif' => true],
-            ['code' => 'hanche', 'nom' => 'Tour de hanches', 'unite' => 'cm', 'categorie' => 'principale', 'description' => 'Mesure indispensable pour jupes, pantalons et robes ajustées.', 'est_actif' => true],
-            ['code' => 'epaule', 'nom' => 'Carrure épaule', 'unite' => 'cm', 'categorie' => 'principale', 'description' => 'Carrure d\'épaule pour hauts, chemises et boubous.', 'est_actif' => true],
-            ['code' => 'longueur_robe', 'nom' => 'Longueur robe', 'unite' => 'cm', 'categorie' => 'secondaire', 'description' => 'Longueur totale d\'une robe ou kaba.', 'est_actif' => true],
-            ['code' => 'longueur_manche', 'nom' => 'Longueur manche', 'unite' => 'cm', 'categorie' => 'secondaire', 'description' => 'Longueur de manche pour chemises, robes et vestes.', 'est_actif' => true],
-            ['code' => 'tour_cou', 'nom' => 'Tour de cou', 'unite' => 'cm', 'categorie' => 'secondaire', 'description' => 'Mesure utile pour cols mao, chemises et tuniques.', 'est_actif' => true],
-            ['code' => 'ceinture', 'nom' => 'Tour de ceinture', 'unite' => 'cm', 'categorie' => 'secondaire', 'description' => 'Aide au montage des ceintures et jupes hautes.', 'est_actif' => true],
-            ['code' => 'entrejambe', 'nom' => 'Entrejambe', 'unite' => 'cm', 'categorie' => 'secondaire', 'description' => 'Mesure importante pour pantalons et ensembles.', 'est_actif' => true],
+            ['code' => 'HAUTEUR',      'nom' => 'Hauteur totale',               'unite' => 'cm', 'categorie' => 'longueur',     'description' => 'Hauteur estimée à partir des repères corporels.'],
+            ['code' => 'EPAULES',      'nom' => 'Largeur épaules',              'unite' => 'cm', 'categorie' => 'largeur',      'description' => 'Carrure des épaules (face + dos fusionnés).'],
+            ['code' => 'TORSE',        'nom' => 'Longueur torse',               'unite' => 'cm', 'categorie' => 'longueur',     'description' => 'Longueur entre les épaules et la taille/hanche.'],
+            ['code' => 'BRA_TOTAL',    'nom' => 'Longueur bras total',          'unite' => 'cm', 'categorie' => 'longueur',     'description' => 'Longueur de l\'épaule au poignet.'],
+            ['code' => 'BRA_HAUT',     'nom' => 'Haut du bras',                 'unite' => 'cm', 'categorie' => 'longueur',     'description' => 'Longueur de l\'épaule au coude.'],
+            ['code' => 'BRA_AV',       'nom' => 'Avant-bras',                   'unite' => 'cm', 'categorie' => 'longueur',     'description' => 'Longueur du coude au poignet.'],
+            ['code' => 'JAMBE',        'nom' => 'Longueur jambe',               'unite' => 'cm', 'categorie' => 'longueur',     'description' => 'Longueur de la hanche à la cheville.'],
+            ['code' => 'CUISSE',       'nom' => 'Longueur cuisse',              'unite' => 'cm', 'categorie' => 'longueur',     'description' => 'Longueur de la hanche au genou.'],
+            ['code' => 'MOLLET',       'nom' => 'Longueur mollet',              'unite' => 'cm', 'categorie' => 'longueur',     'description' => 'Longueur du genou à la cheville.'],
+            ['code' => 'HANCHES_L',    'nom' => 'Largeur hanches',              'unite' => 'cm', 'categorie' => 'largeur',      'description' => 'Largeur du bassin au niveau des hanches.'],
+            ['code' => 'POITRINE',     'nom' => 'Tour de poitrine',             'unite' => 'cm', 'categorie' => 'circonference', 'description' => 'Tour de poitrine estimé par ellipse ou ratio.'],
+            ['code' => 'TAILLE',       'nom' => 'Tour de taille',               'unite' => 'cm', 'categorie' => 'circonference', 'description' => 'Tour de taille estimé par ellipse ou ratio.'],
+            ['code' => 'TOUR_HANCHES', 'nom' => 'Tour de hanches',              'unite' => 'cm', 'categorie' => 'circonference', 'description' => 'Tour de hanches estimé par ellipse ou ratio.'],
+            ['code' => 'TOUR_COU',     'nom' => 'Tour de cou',                  'unite' => 'cm', 'categorie' => 'circonference', 'description' => 'Tour de cou estimé par ratio.'],
+            ['code' => 'TOUR_GENOU',   'nom' => 'Tour de genou',                'unite' => 'cm', 'categorie' => 'circonference', 'description' => 'Tour de genou estimé par ratio.'],
+            ['code' => 'TOUR_POIGNET', 'nom' => 'Tour de poignet',              'unite' => 'cm', 'categorie' => 'circonference', 'description' => 'Tour de poignet estimé par ratio.'],
         ];
 
         foreach ($types as $t) {
@@ -29,7 +36,7 @@ class TypeMesuresTableSeeder extends Seeder
                     'unite' => $t['unite'],
                     'categorie' => $t['categorie'],
                     'description' => $t['description'],
-                    'est_actif' => $t['est_actif'],
+                    'est_actif' => $t['est_actif'] ?? true,
                 ],
             );
         }
