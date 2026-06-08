@@ -302,13 +302,13 @@ class MobileClientController extends Controller
 
     private function isPrimaryMeasurementCategory(?string $category): bool
     {
-        return in_array($category, ['principale', 'primaire', 'base'], true);
+        return in_array($category, ['principale', 'primaire', 'base', 'longueur', 'largeur', 'circonference'], true);
     }
 
     private function measurementCategoryPriority(?string $category): int
     {
         return match ($category) {
-            'principale', 'primaire', 'base' => 1,
+            'principale', 'primaire', 'base', 'longueur', 'largeur', 'circonference' => 1,
             'secondaire', 'derivee' => 2,
             default => 3,
         };
