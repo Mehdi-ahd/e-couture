@@ -27,10 +27,13 @@ class MeasureCvGateway
                 previous: $exception,
             );
         } catch (RequestException $exception) {
+            $body = $exception->response->json() ?? [];
+            $detail = $body['detail'] ?? $body['message'] ?? 'Le service de mesures a refusé la requête.';
+
             throw new MeasureCvGatewayException(
-                message: 'Le service de mesures a refusé la requête.',
+                message: "Mesure CV : $detail",
                 statusCode: $exception->response->status(),
-                context: $exception->response->json() ?? [],
+                context: $body,
                 previous: $exception,
             );
         }
