@@ -23,7 +23,7 @@ class ModeleVetementsTableSeeder extends Seeder
                 'type_code' => 'robe',
                 'portee' => 'public',
                 'statut' => 'publie',
-                'prestataire_id' => null,
+                'prestataire_id' => 2,
                 'materials' => ['Wax hollandais', 'Doublure légère'],
             ],
             [
@@ -32,7 +32,7 @@ class ModeleVetementsTableSeeder extends Seeder
                 'type_code' => 'ensemble',
                 'portee' => 'public',
                 'statut' => 'publie',
-                'prestataire_id' => null,
+                'prestataire_id' => 3,
                 'materials' => ['Wax hollandais', 'Popeline blanche'],
             ],
             [
