@@ -20,8 +20,8 @@ return new class extends Migration
                 ->restrictOnDelete();
             $table->string('nom');
             $table->text('description');
-            $table->string('portee');
-            $table->string('statut');
+            $table->string('portee'); //public, privé
+            $table->string('statut'); // actif, inactif
             $table->timestamps();
         });
     }
