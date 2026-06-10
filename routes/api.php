@@ -47,6 +47,8 @@ Route::prefix('mobile')->name('api.mobile.')->group(function () {
         Route::apiResource('clients.measurement-sheets', MobileMeasurementSheetController::class)
             ->parameters(['clients' => 'client', 'measurement-sheets' => 'sheet'])
             ->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::post('clients/{client}/measurement-sheets/{sheet}/validate', [MobileMeasurementSheetController::class, 'validateSheet'])
+            ->name('clients.measurement-sheets.validate');
         Route::post('clients/{client}/guided-measurement-sheets', [MobileGuidedMeasurementSheetController::class, 'store'])->name('clients.guided-measurement-sheets.store');
         Route::get('clients/{client}/guided-measurement-sheets/{sheet}', [MobileGuidedMeasurementSheetController::class, 'show'])->name('clients.guided-measurement-sheets.show');
         Route::apiResource('clients.orders', MobileOrderController::class)

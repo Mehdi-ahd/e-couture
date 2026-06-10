@@ -130,6 +130,25 @@ class MobileMeasurementSheetController extends Controller
         ]);
     }
 
+    public function validateSheet(Request $request, string $client, string $sheet): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $record = $this->findClientForUser($user, $client);
+        $item = $this->findSheetForClient($record, $sheet);
+
+        $item->update(['validee' => true]);
+
+        $item = $this->sheetQuery($record)->whereKey($item->getKey())->firstOrFail();
+
+        return response()->json([
+            'message' => 'Fiche de mesures validée.',
+            'data' => [
+                'item' => $this->serializeSheet($item),
+            ],
+        ]);
+    }
+
     private function findClientForUser(User $user, string $externalId): Client
     {
         return Client::query()
@@ -201,7 +220,10 @@ class MobileMeasurementSheetController extends Controller
             'date_label' => $sheet->date?->format('d/m/Y') ?? 'Sans date',
             'methode' => $sheet->methode,
             'measurements_count' => $sheet->mesures_count ?? $sheet->mesures->count(),
-            'status_label' => ($sheet->mesures_count ?? $sheet->mesures->count()) > 0 ? 'Complète' : 'À compléter',
+            'status_label' => $sheet->validee
+                ? 'Validée'
+                : (($sheet->mesures_count ?? $sheet->mesures->count()) > 0 ? 'En attente de validation' : 'À compléter'),
+            'validee' => $sheet->validee,
         ];
     }
 

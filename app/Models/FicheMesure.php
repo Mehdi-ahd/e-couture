@@ -17,12 +17,14 @@ class FicheMesure extends BaseModel implements HasMedia
         'client_id',
         'date',
         'methode',
+        'validee',
     ];
 
     protected function casts(): array
     {
         return [
             'date' => 'date',
+            'validee' => 'boolean',
         ];
     }
 
