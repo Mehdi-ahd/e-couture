@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\SocialAuthController;
+use App\Http\Controllers\Api\Mobile\MobileAnnotationPatronController;
 use App\Http\Controllers\Api\Mobile\MobileAuthSyncController;
 use App\Http\Controllers\Api\Mobile\MobileClientController;
 use App\Http\Controllers\Api\Mobile\MobileFormeDecoupeController;
@@ -13,10 +14,13 @@ use App\Http\Controllers\Api\Mobile\MobileOrderController;
 use App\Http\Controllers\Api\Mobile\MobilePatternController;
 use App\Http\Controllers\Api\Mobile\MobilePatternPieceController;
 use App\Http\Controllers\Api\Mobile\MobilePatternScanController;
+use App\Http\Controllers\Api\Mobile\MobilePatternTypeMesureController;
 use App\Http\Controllers\Api\Mobile\MobilePieceDispositionController;
 use App\Http\Controllers\Api\Mobile\MobilePingController;
+use App\Http\Controllers\Api\Mobile\MobileRegleProportionController;
 use App\Http\Controllers\Api\Mobile\MobileRemoveBgAccountController;
 use App\Http\Controllers\Api\Mobile\MobileScanController;
+use App\Http\Controllers\Api\Mobile\MobileTypeMesureController;
 use App\Http\Controllers\Api\Mobile\MobileTypeVetementController;
 use App\Http\Controllers\Api\Mobile\MobileWorkspaceController;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +62,8 @@ Route::prefix('mobile')->name('api.mobile.')->group(function () {
         Route::apiResource('patterns.pieces', MobilePatternPieceController::class)
             ->parameters(['patterns' => 'pattern', 'pieces' => 'piece'])
             ->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::get('patterns/{pattern}/type-mesures', [MobilePatternTypeMesureController::class, 'index'])->name('patterns.type-mesures.index');
+        Route::put('patterns/{pattern}/type-mesures', [MobilePatternTypeMesureController::class, 'sync'])->name('patterns.type-mesures.sync');
         Route::post('scan/pattern', MobilePatternScanController::class)->name('scan.pattern');
         Route::get('scan/pattern/{scan}/cutout', [MobilePatternScanController::class, 'downloadCutout'])->name('scan.pattern.cutout');
         Route::get('remove-bg/account', MobileRemoveBgAccountController::class)->name('remove-bg.account');
@@ -67,6 +73,11 @@ Route::prefix('mobile')->name('api.mobile.')->group(function () {
         Route::apiResource('type-vetements', MobileTypeVetementController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::apiResource('formes-decoupe', MobileFormeDecoupeController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::apiResource('materiaux', MobileMateriauController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::apiResource('type-mesures', MobileTypeMesureController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::apiResource('regles-proportions', MobileRegleProportionController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::apiResource('pieces.annotations', MobileAnnotationPatronController::class)
+            ->parameters(['pieces' => 'piece', 'annotations' => 'annotation'])
+            ->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::post('scan', MobileScanController::class)->name('scan');
     });
 });

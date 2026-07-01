@@ -16,6 +16,7 @@ class PiecePatron extends BaseModel
         'nom',
         'ordre',
         'donnees_geometriques',
+        'donnees_geometriques_v2',
     ];
 
     protected function casts(): array
@@ -23,6 +24,7 @@ class PiecePatron extends BaseModel
         return [
             'ordre' => 'integer',
             'donnees_geometriques' => 'array',
+            'donnees_geometriques_v2' => 'binary',
         ];
     }
 

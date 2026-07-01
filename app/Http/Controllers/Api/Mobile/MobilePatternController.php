@@ -66,8 +66,12 @@ class MobilePatternController extends Controller
         $pattern = Patron::query()->create([
             'methode' => $validated['methode'],
             'version' => $validated['version'] ?? 1,
+            'version_semver' => $validated['version_semver'] ?? null,
             'fichier_url' => $validated['fichier_url'] ?? null,
             'donnees_dessin' => $validated['donnees_dessin'] ?? null,
+            'donnees_dessin_v2' => isset($validated['donnees_dessin_v2'])
+                ? base64_decode($validated['donnees_dessin_v2'])
+                : null,
             'statut' => $validated['statut'] ?? 'brouillon',
             'modele_vetement_id' => $modele->id,
         ]);
@@ -155,8 +159,12 @@ class MobilePatternController extends Controller
         $record->fill([
             'methode' => $validated['methode'] ?? $record->methode,
             'version' => $validated['version'] ?? $record->version,
+            'version_semver' => $validated['version_semver'] ?? $record->version_semver,
             'fichier_url' => $validated['fichier_url'] ?? $record->fichier_url,
             'donnees_dessin' => $validated['donnees_dessin'] ?? $record->donnees_dessin,
+            'donnees_dessin_v2' => isset($validated['donnees_dessin_v2'])
+                ? base64_decode($validated['donnees_dessin_v2'])
+                : $record->donnees_dessin_v2,
             'statut' => $validated['statut'] ?? $record->statut,
         ])->save();
 
@@ -240,8 +248,10 @@ class MobilePatternController extends Controller
             'modele_statut' => ['sometimes', 'string', 'max:40'],
             'methode' => [...$required, 'string', 'max:40'],
             'version' => ['sometimes', 'integer', 'min:1'],
+            'version_semver' => ['nullable', 'string', 'max:20'],
             'fichier_url' => ['nullable', 'string', 'max:500'],
             'donnees_dessin' => ['nullable', 'array'],
+            'donnees_dessin_v2' => ['nullable', 'string'],
             'statut' => ['sometimes', 'string', 'max:40'],
         ]);
     }
@@ -296,8 +306,13 @@ class MobilePatternController extends Controller
                 'external_id' => $pattern->external_id,
                 'methode' => $pattern->methode,
                 'version' => $pattern->version,
+                'version_semver' => $pattern->version_semver,
+                'version_label' => $pattern->version_label,
                 'fichier_url' => $pattern->fichier_url,
                 'donnees_dessin' => $pattern->donnees_dessin,
+                'donnees_dessin_v2' => $pattern->donnees_dessin_v2 !== null
+                    ? base64_encode($pattern->donnees_dessin_v2)
+                    : null,
                 'statut' => $pattern->statut,
                 'modele_vetement_id' => $pattern->modele_vetement_id,
                 'created_at' => $pattern->created_at?->toISOString(),

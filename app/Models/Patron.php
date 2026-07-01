@@ -15,8 +15,10 @@ class Patron extends BaseModel
         'modele_vetement_id',
         'methode',
         'version',
+        'version_semver',
         'fichier_url',
         'donnees_dessin',
+        'donnees_dessin_v2',
         'statut',
     ];
 
@@ -24,8 +26,14 @@ class Patron extends BaseModel
     {
         return [
             'donnees_dessin' => 'array',
+            'donnees_dessin_v2' => 'binary',
             'created_at' => 'datetime',
         ];
+    }
+
+    public function getVersionLabelAttribute(): string
+    {
+        return $this->version_semver ?? sprintf('v%d.0', $this->version);
     }
 
     public function modeleVetement(): BelongsTo
