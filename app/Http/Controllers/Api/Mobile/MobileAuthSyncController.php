@@ -87,7 +87,7 @@ class MobileAuthSyncController extends Controller
 
                 $socialAccount->user()->associate($user);
                 $socialAccount->fill([
-                    'provider_data' => ['email' => $email],
+                    'provider_email' => $email,
                 ]);
                 $socialAccount->save();
             }

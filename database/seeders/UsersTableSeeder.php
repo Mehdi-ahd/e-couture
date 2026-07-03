@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UsersTableSeeder extends Seeder
 {
@@ -14,12 +15,16 @@ class UsersTableSeeder extends Seeder
         User::ensureRole(User::ROLE_COUTURIER);
 
         // Administrator
-        $admin = User::factory()->create([
-            'nom' => 'Adjovi',
-            'prenom' => 'Kossi',
-            'telephone' => '+22990000001',
-            'email' => 'admin@koda.bj',
-        ]);
+        $admin = User::query()->updateOrCreate(
+            ['email' => 'admin@koda.bj'],
+            [
+                'nom' => 'Adjovi',
+                'prenom' => 'Kossi',
+                'telephone' => '+22990000001',
+                'password' => Hash::make('password'),
+                'est_actif' => true,
+            ],
+        );
         $admin->syncRoles([User::ROLE_ADMINISTRATEUR]);
 
         // Prestataires (couturiers) — example Beninese names
@@ -31,13 +36,16 @@ class UsersTableSeeder extends Seeder
         ];
 
         foreach ($prestataires as $p) {
-            $user = User::factory()->create([
-                'nom' => $p['nom'],
-                'prenom' => $p['prenom'],
-                'telephone' => $p['telephone'],
-                'email' => $p['email'],
-                'password' => bcrypt('password'), // Default password for all prestataires
-            ]);
+            $user = User::query()->updateOrCreate(
+                ['email' => $p['email']],
+                [
+                    'nom' => $p['nom'],
+                    'prenom' => $p['prenom'],
+                    'telephone' => $p['telephone'],
+                    'password' => Hash::make('password'),
+                    'est_actif' => true,
+                ],
+            );
 
             $user->syncRoles([User::ROLE_COUTURIER]);
         }

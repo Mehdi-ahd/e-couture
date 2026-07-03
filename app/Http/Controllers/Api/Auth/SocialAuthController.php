@@ -69,6 +69,10 @@ class SocialAuthController extends Controller
 
     private function findOrCreateSocialUser(string $provider, ProviderUser $providerUser): array
     {
+        $providerEmail = filled($providerUser->getEmail())
+            ? Str::lower((string) $providerUser->getEmail())
+            : null;
+
         $socialAccount = SocialAccount::query()
             ->where('provider', $provider)
             ->where('provider_user_id', $providerUser->getId())
@@ -82,8 +86,8 @@ class SocialAuthController extends Controller
 
         $user = User::query()
             ->when(
-                filled($providerUser->getEmail()),
-                fn ($query) => $query->where('email', $providerUser->getEmail()),
+                filled($providerEmail),
+                fn ($query) => $query->where('email', $providerEmail),
                 fn ($query) => $query->whereRaw('1 = 0'),
             )
             ->first();
@@ -96,9 +100,9 @@ class SocialAuthController extends Controller
             $user = User::create([
                 'nom' => $nom,
                 'prenom' => $prenom,
-                'email' => $providerUser->getEmail(),
+                'email' => $providerEmail,
                 'password' => Hash::make(Str::password(32)),
-                'email_verified_at' => $providerUser->getEmail() ? now() : null,
+                'email_verified_at' => $providerEmail ? now() : null,
             ]);
             $user->assignApplicationRole(User::ROLE_COUTURIER);
 
@@ -119,8 +123,12 @@ class SocialAuthController extends Controller
 
     private function hydrateSocialAccount(SocialAccount $socialAccount, ProviderUser $providerUser): SocialAccount
     {
+        $providerEmail = filled($providerUser->getEmail())
+            ? Str::lower((string) $providerUser->getEmail())
+            : null;
+
         return $socialAccount->fill([
-            'provider_email' => $providerUser->getEmail(),
+            'provider_email' => $providerEmail,
             'provider_avatar_url' => $providerUser->getAvatar(),
             'provider_token' => $providerUser->token,
             'provider_refresh_token' => $providerUser->refreshToken,

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FormeDecoupe extends BaseModel
 {
-
     protected $table = 'formes_decoupe';
 
     public $timestamps = false;
@@ -24,8 +23,8 @@ class FormeDecoupe extends BaseModel
     {
         return [
             'donnees_formes' => 'array',
-            'est_global'     => 'boolean',
-            'created_at'     => 'datetime',
+            'est_global' => 'boolean',
+            'created_at' => 'datetime',
         ];
     }
 

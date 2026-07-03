@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Materiau extends BaseModel
 {
-
     protected $table = 'materiaux';
 
     public $timestamps = false;

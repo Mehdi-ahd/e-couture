@@ -21,6 +21,7 @@ class RegisterRequest extends FormRequest
             'telephone' => ['required', 'string', 'max:20', 'unique:'.User::class.',telephone'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:190', 'unique:'.User::class.',email'],
             'password' => ['required', 'confirmed', Password::defaults()],
+            'device_name' => ['nullable', 'string', 'max:120'],
         ];
     }
 }

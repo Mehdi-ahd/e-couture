@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DispositionPiecePatron extends BaseModel
 {
-
     protected $table = 'disposition_piece_patrons';
 
     public $timestamps = false;
@@ -27,8 +26,8 @@ class DispositionPiecePatron extends BaseModel
         return [
             'position_x' => 'decimal:4',
             'position_y' => 'decimal:4',
-            'rotation'   => 'decimal:4',
-            'echelle'    => 'decimal:4',
+            'rotation' => 'decimal:4',
+            'echelle' => 'decimal:4',
             'created_at' => 'datetime',
         ];
     }

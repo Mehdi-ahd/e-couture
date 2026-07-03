@@ -26,7 +26,7 @@ class Mesure extends Model
     protected function casts(): array
     {
         return [
-            'valeur'    => 'decimal:2',
+            'valeur' => 'decimal:2',
             'confiance' => 'decimal:4',
         ];
     }

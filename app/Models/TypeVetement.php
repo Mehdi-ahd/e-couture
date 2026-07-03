@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TypeVetement extends BaseModel
 {
-
     protected $table = 'type_vetements';
 
     protected $fillable = [

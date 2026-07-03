@@ -52,4 +52,23 @@ return [
         'providers' => ['google', 'facebook'],
     ],
 
+    'depth_pro' => [
+        'base_url' => env('DEPTH_PRO_BASE_URL', 'http://127.0.0.1:8001'),
+        'timeout' => (int) env('DEPTH_PRO_TIMEOUT', 120),
+        'connect_timeout' => (int) env('DEPTH_PRO_CONNECT_TIMEOUT', 5),
+        'api_key' => env('DEPTH_PRO_API_KEY'),
+    ],
+
+    'remove_bg' => [
+        'api_key' => env('REMOVE_BG_API_KEY'),
+        'default_size' => env('REMOVE_BG_DEFAULT_SIZE', 'preview'),
+    ],
+
+    'measure_cv' => [
+        'base_url' => env('MEASURE_CV_BASE_URL', 'http://127.0.0.1:8000'),
+        'timeout' => (int) env('MEASURE_CV_TIMEOUT', 120),
+        'connect_timeout' => (int) env('MEASURE_CV_CONNECT_TIMEOUT', 5),
+        'api_key' => env('MEASURE_CV_API_KEY'),
+    ],
+
 ];

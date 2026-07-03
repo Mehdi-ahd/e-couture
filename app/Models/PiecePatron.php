@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PiecePatron extends BaseModel
 {
-
     protected $table = 'piece_patrons';
 
     public $timestamps = false;
@@ -17,6 +16,7 @@ class PiecePatron extends BaseModel
         'nom',
         'ordre',
         'donnees_geometriques',
+        'donnees_geometriques_v2',
     ];
 
     protected function casts(): array
@@ -24,6 +24,7 @@ class PiecePatron extends BaseModel
         return [
             'ordre' => 'integer',
             'donnees_geometriques' => 'array',
+            'donnees_geometriques_v2' => 'binary',
         ];
     }
 
@@ -40,5 +41,10 @@ class PiecePatron extends BaseModel
     public function dispositionPiecePatrons(): HasMany
     {
         return $this->hasMany(DispositionPiecePatron::class, 'piece_patron_id');
+    }
+
+    public function dispositions(): HasMany
+    {
+        return $this->dispositionPiecePatrons();
     }
 }

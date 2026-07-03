@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Mobile;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use App\Models\FicheMesure;
 use App\Models\Mesure;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,7 +28,10 @@ class MobileClientController extends Controller
                     'total' => $clients->count(),
                     'active' => $clients->where('est_actif', true)->count(),
                     'pending_measurements' => $clients
-                        ->filter(fn (Client $client) => $client->fichesMesures->first()?->statut !== 'valide')
+                        ->where('est_actif', true)
+                        ->filter(
+                            fn (Client $client) => $this->resolveMeasurementStatus($client->fichesMesures->first()) !== 'valide',
+                        )
                         ->count(),
                 ],
                 'items' => $clients->map(fn (Client $client) => $this->serializeClient($client))->values()->all(),
@@ -46,9 +50,10 @@ class MobileClientController extends Controller
             'prenom' => $validated['prenom'],
             'telephone' => $validated['telephone'],
             'email' => $validated['email'] ?? null,
+            'genre' => $validated['genre'] ?? null,
             'date_naissance' => $validated['date_naissance'] ?? null,
             'prestataire_id' => $user->id,
-            'est_actif' => true,
+            'est_actif' => $validated['est_actif'] ?? true,
         ]);
         $client = $this->baseQueryForUser($user)
             ->whereKey($client->getKey())
@@ -99,7 +104,7 @@ class MobileClientController extends Controller
                     'client_code' => sprintf('KODA-%04d', $record->id),
                     'last_updated_label' => $record->updated_at?->format('d/m/Y') ?? 'A jour',
                     'latest_measure_label' => $latestMeasure?->date?->format('d/m/Y') ?? 'Aucune mesure',
-                    'measure_status_label' => ucfirst((string) ($latestMeasure?->statut ?? 'nouveau')),
+                    'measure_status_label' => $this->resolveMeasurementStatusLabel($latestMeasure),
                     'primary_measurements' => $primaryLines
                         ->map(fn (Mesure $line) => $this->serializeMeasurement($line))
                         ->values()
@@ -168,7 +173,10 @@ class MobileClientController extends Controller
             ->where('prestataire_id', $user->id)
             ->withCount(['fichesMesures', 'commandesVetements'])
             ->with([
-                'fichesMesures' => fn ($query) => $query->latest('date')->limit(1),
+                'fichesMesures' => fn ($query) => $query
+                    ->withCount('mesures')
+                    ->latest('date')
+                    ->limit(1),
                 'commandesVetements' => fn ($query) => $query->latest('date_commande')->limit(1),
                 'commandesVetements.modeleVetement',
             ]);
@@ -177,7 +185,7 @@ class MobileClientController extends Controller
     private function findForUser(User $user, string $externalId): Client
     {
         return $this->baseQueryForUser($user)
-            ->where('id', $externalId)
+            ->where('external_id', $externalId)
             ->firstOrFail();
     }
 
@@ -185,10 +193,11 @@ class MobileClientController extends Controller
     {
         return Client::query()
             ->where('prestataire_id', $user->id)
-            ->where('id', $externalId)
+            ->where('external_id', $externalId)
             ->withCount(['fichesMesures', 'commandesVetements'])
             ->with([
                 'fichesMesures' => fn ($query) => $query
+                    ->withCount('mesures')
                     ->latest('date')
                     ->limit(2)
                     ->with(['mesures.typeMesure']),
@@ -209,7 +218,9 @@ class MobileClientController extends Controller
             'prenom' => [...$required, 'string', 'max:191'],
             'telephone' => [...$required, 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:190'],
+            'genre' => ['nullable', 'string', 'max:30'],
             'date_naissance' => ['nullable', 'date'],
+            'est_actif' => ['sometimes', 'boolean'],
         ]);
     }
 
@@ -217,31 +228,61 @@ class MobileClientController extends Controller
     {
         $latestMeasure = $client->fichesMesures->first();
         $latestCommand = $client->commandesVetements->first();
+        $measurementStatus = $this->resolveMeasurementStatus($latestMeasure);
 
         return [
+            'id' => $client->id,
+            'external_id' => $client->external_id,
             'nom' => $client->nom,
             'prenom' => $client->prenom,
             'full_name' => trim($client->prenom.' '.$client->nom),
             'telephone' => $client->telephone,
             'email' => $client->email,
+            'genre' => $client->genre,
             'date_naissance' => $client->date_naissance?->toDateString(),
             'est_actif' => $client->est_actif,
+            'prestataire_id' => $client->prestataire_id,
+            'created_at' => $client->created_at?->toISOString(),
+            'updated_at' => $client->updated_at?->toISOString(),
             'measurement_count' => $client->fiches_mesures_count ?? 0,
             'order_count' => $client->commandes_vetements_count ?? 0,
             'look_label' => $latestCommand?->modeleVetement?->nom ?? 'Carnet client',
-            'next_action' => $this->resolveNextAction($latestMeasure?->statut),
+            'next_action' => $this->resolveNextAction($measurementStatus, $latestCommand !== null),
             'last_visit_label' => $latestMeasure?->date?->format('d/m/Y') ?? 'Aucune prise',
-            'last_measure_status' => $latestMeasure?->statut ?? 'nouveau',
+            'last_measure_status' => $measurementStatus,
         ];
     }
 
-    private function resolveNextAction(?string $status): string
+    private function resolveNextAction(string $status, bool $hasOrder): string
     {
+        if ($status === 'valide' && $hasOrder) {
+            return 'Suivre la commande';
+        }
+
         return match ($status) {
             'valide' => 'Ouvrir le dossier',
-            'archive' => 'Relancer le suivi',
-            'brouillon' => 'Verifier les mesures',
+            'brouillon' => 'Compléter la fiche',
             default => 'Prendre les mesures',
+        };
+    }
+
+    private function resolveMeasurementStatus(?FicheMesure $latestMeasure): string
+    {
+        if ($latestMeasure === null) {
+            return 'nouveau';
+        }
+
+        $count = $latestMeasure->mesures_count ?? $latestMeasure->mesures->count();
+
+        return $count > 0 ? 'valide' : 'brouillon';
+    }
+
+    private function resolveMeasurementStatusLabel(?FicheMesure $latestMeasure): string
+    {
+        return match ($this->resolveMeasurementStatus($latestMeasure)) {
+            'valide' => 'Mesures validées',
+            'brouillon' => 'Fiche à compléter',
+            default => 'Aucune mesure',
         };
     }
 
@@ -261,13 +302,13 @@ class MobileClientController extends Controller
 
     private function isPrimaryMeasurementCategory(?string $category): bool
     {
-        return in_array($category, ['principale', 'primaire', 'base'], true);
+        return in_array($category, ['principale', 'primaire', 'base', 'longueur', 'largeur', 'circonference'], true);
     }
 
     private function measurementCategoryPriority(?string $category): int
     {
         return match ($category) {
-            'principale', 'primaire', 'base' => 1,
+            'principale', 'primaire', 'base', 'longueur', 'largeur', 'circonference' => 1,
             'secondaire', 'derivee' => 2,
             default => 3,
         };
@@ -276,8 +317,9 @@ class MobileClientController extends Controller
     private function mapOrderTone(string $status): string
     {
         return match ($status) {
-            'fini', 'livre' => 'success',
+            'fini', 'livre', 'livree', 'valide', 'terminee' => 'success',
             'en_coupe', 'en_cours' => 'info',
+            'archive' => 'warning',
             default => 'neutral',
         };
     }

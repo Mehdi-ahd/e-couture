@@ -10,11 +10,11 @@ return new class extends Migration
     {
         Schema::create('modele_vetement_materiau', function (Blueprint $table) {
             $table->foreignId('modele_vetement_id')
-                  ->constrained('modele_vetements')
-                  ->cascadeOnDelete();
+                ->constrained('modele_vetements')
+                ->cascadeOnDelete();
             $table->foreignId('materiau_id')
-                  ->constrained('materiaux')
-                  ->cascadeOnDelete();
+                ->constrained('materiaux')
+                ->cascadeOnDelete();
             $table->primary(['modele_vetement_id', 'materiau_id']);
         });
     }

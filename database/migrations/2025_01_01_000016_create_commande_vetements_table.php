@@ -12,15 +12,15 @@ return new class extends Migration
             $table->id();
             $table->uuid('external_id')->unique();
             $table->foreignId('client_id')
-                  ->constrained('clients')
-                  ->restrictOnDelete();
+                ->constrained('clients')
+                ->restrictOnDelete();
             $table->foreignId('modele_vetement_id')
-                  ->constrained('modele_vetements')
-                  ->restrictOnDelete();
+                ->constrained('modele_vetements')
+                ->restrictOnDelete();
             $table->foreignId('fiche_mesure_id')
-                  ->nullable()
-                  ->constrained('fiche_mesures')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('fiche_mesures')
+                ->nullOnDelete();
             $table->string('statut');
             $table->text('notes')->nullable();
             $table->date('date_commande');

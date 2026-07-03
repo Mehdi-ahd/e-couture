@@ -12,10 +12,10 @@ return new class extends Migration
             $table->id();
             $table->uuid('external_id')->unique();
             $table->foreignId('modele_vetement_id')
-                  ->nullable()
-                  ->unique()
-                  ->constrained('modele_vetements')
-                  ->nullOnDelete();
+                ->nullable()
+                ->unique()
+                ->constrained('modele_vetements')
+                ->nullOnDelete();
             $table->string('methode');
             $table->unsignedInteger('version')->default(1);
             $table->string('fichier_url')->nullable();

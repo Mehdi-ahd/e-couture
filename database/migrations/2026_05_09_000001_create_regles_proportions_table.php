@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
             $table->uuid('external_id')->unique();
             $table->foreignId('type_mesure_id')
-                  ->constrained('type_mesures')
-                  ->restrictOnDelete();
+                ->constrained('type_mesures')
+                ->restrictOnDelete();
             $table->string('nom');
             $table->decimal('coefficient', 10, 6);
             $table->decimal('offset', 10, 6);

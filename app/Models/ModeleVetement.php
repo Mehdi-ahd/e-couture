@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ModeleVetement extends BaseModel
 {
-
     protected $table = 'modele_vetements';
 
     protected $fillable = [

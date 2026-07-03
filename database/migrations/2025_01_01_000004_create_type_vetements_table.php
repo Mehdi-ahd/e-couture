@@ -14,6 +14,8 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->string('nom');
             $table->text('description');
+            $table->string('genre')->nullable(); // 'homme', 'femme' ou 'mixte'
+            $table->string('section')->nullable(); // 'adulte' ou 'enfant'
             $table->boolean('est_actif')->default(true);
             $table->timestamps();
         });
