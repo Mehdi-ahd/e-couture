@@ -39,13 +39,19 @@ class MobileGuidedMeasurementSheetController extends Controller
             ->toMediaCollection('profil');
 
         try {
-            $this->gateway->measure([
+            $payload = [
                 'fiche_id' => $sheet->external_id,
                 'client_id' => $record->external_id,
                 'face_url' => $request->input('face_url'),
                 'dos_url' => $request->input('dos_url'),
                 'profil_url' => $request->input('profil_url'),
-            ]);
+            ];
+
+            if ($request->has('known_height_cm')) {
+                $payload['known_height_cm'] = (float) $request->input('known_height_cm');
+            }
+
+            $this->gateway->measure($payload);
         } catch (MeasureCvGatewayException $exception) {
             $sheet->clearMediaCollection('face');
             $sheet->clearMediaCollection('dos');

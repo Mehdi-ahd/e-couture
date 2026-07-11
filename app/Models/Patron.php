@@ -26,7 +26,6 @@ class Patron extends BaseModel
     {
         return [
             'donnees_dessin' => 'array',
-            'donnees_dessin_v2' => 'binary',
             'created_at' => 'datetime',
         ];
     }
