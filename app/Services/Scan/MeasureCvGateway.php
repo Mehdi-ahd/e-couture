@@ -28,7 +28,20 @@ class MeasureCvGateway
             );
         } catch (RequestException $exception) {
             $body = $exception->response->json() ?? [];
-            $detail = $body['detail'] ?? $body['message'] ?? 'Le service de mesures a refusé la requête.';
+            $rawDetail = $body['detail'] ?? $body['message'] ?? null;
+
+            if (is_array($rawDetail)) {
+                $detail = json_encode($rawDetail, JSON_UNESCAPED_UNICODE);
+            } elseif (is_string($rawDetail)) {
+                $detail = $rawDetail;
+            } else {
+                $detail = 'Le service de mesures a refusé la requête.';
+            }
+
+            logger()->error('Measure CV error: {status} {body}', [
+                'status' => $exception->response->status(),
+                'body' => $body,
+            ]);
 
             throw new MeasureCvGatewayException(
                 message: "Mesure CV : $detail",
