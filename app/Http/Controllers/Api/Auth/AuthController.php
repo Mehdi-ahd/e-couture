@@ -7,6 +7,7 @@ use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Models\SocialAccount;
 use App\Models\User;
+use App\Models\VerificationCode;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
@@ -53,6 +54,34 @@ class AuthController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
+
+        // If 2FA is enabled, send a verification code instead of returning a token
+        if ($user->two_factor_confirmed_at !== null) {
+            $code = (string) random_int(100000, 999999);
+
+            VerificationCode::where('user_id', $user->id)
+                ->where('type', 'two_factor')
+                ->whereNull('used_at')
+                ->update(['used_at' => now()]);
+
+            VerificationCode::create([
+                'user_id' => $user->id,
+                'type' => 'two_factor',
+                'code' => $code,
+                'destination' => $user->email,
+                'expires_at' => now()->addMinutes(10),
+            ]);
+
+            logger("2FA code for {$user->email}: {$code}");
+
+            return response()->json([
+                'message' => 'Code de verification 2FA envoye.',
+                'data' => [
+                    'two_factor_challenge' => true,
+                    'email' => $user->email,
+                ],
+            ]);
+        }
 
         return $this->authenticatedResponse(
             $user,

@@ -62,6 +62,10 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
         'mobile_onboarding_completed_at',
         'date_naissance',
         'last_login_at',
+        'phone_verified_at',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
     ];
 
     protected $hidden = [
@@ -77,6 +81,9 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
             'date_soumission' => 'datetime',
             'date_validation' => 'datetime',
             'mobile_onboarding_completed_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
+            'two_factor_confirmed_at' => 'datetime',
+            'two_factor_recovery_codes' => 'array',
             'date_naissance' => 'date',
             'est_actif' => 'boolean',
             'password' => 'hashed',

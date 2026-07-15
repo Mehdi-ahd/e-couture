@@ -17,9 +17,9 @@ use App\Http\Controllers\Api\Mobile\MobilePatternScanController;
 use App\Http\Controllers\Api\Mobile\MobilePatternTypeMesureController;
 use App\Http\Controllers\Api\Mobile\MobilePieceDispositionController;
 use App\Http\Controllers\Api\Mobile\MobilePingController;
-use App\Http\Controllers\Api\Mobile\MobileRegleProportionController;
 use App\Http\Controllers\Api\Mobile\MobileRemoveBgAccountController;
 use App\Http\Controllers\Api\Mobile\MobileScanController;
+use App\Http\Controllers\Api\Mobile\MobileSecurityController;
 use App\Http\Controllers\Api\Mobile\MobileTypeMesureController;
 use App\Http\Controllers\Api\Mobile\MobileTypeVetementController;
 use App\Http\Controllers\Api\Mobile\MobileWorkspaceController;
@@ -34,9 +34,28 @@ Route::prefix('auth')->name('api.auth.')->group(function () {
         Route::get('social/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
     });
 
+    // 2FA challenge — requires email, not a full auth session
+    Route::post('two-factor-challenge', [MobileSecurityController::class, 'twoFactorChallenge'])
+        ->middleware('throttle:6,1')
+        ->name('two-factor.challenge');
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('me', [AuthController::class, 'me'])->name('me');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+        // Security endpoints
+        Route::post('email/verify/send', [MobileSecurityController::class, 'sendEmailVerification'])->name('email.verify.send');
+        Route::post('email/verify', [MobileSecurityController::class, 'verifyEmail'])->name('email.verify');
+        Route::post('phone/verify/send', [MobileSecurityController::class, 'sendPhoneVerification'])->name('phone.verify.send');
+        Route::post('phone/verify', [MobileSecurityController::class, 'verifyPhone'])->name('phone.verify');
+        Route::post('two-factor/enable', [MobileSecurityController::class, 'enableTwoFactor'])->name('two-factor.enable');
+        Route::post('two-factor/confirm', [MobileSecurityController::class, 'confirmTwoFactor'])->name('two-factor.confirm');
+        Route::post('two-factor/disable', [MobileSecurityController::class, 'disableTwoFactor'])->name('two-factor.disable');
+        Route::get('sessions', [MobileSecurityController::class, 'getSessions'])->name('sessions');
+        Route::delete('sessions/{id}', [MobileSecurityController::class, 'revokeSession'])->name('sessions.revoke');
+        Route::delete('sessions', [MobileSecurityController::class, 'revokeOtherSessions'])->name('sessions.revoke-other');
+        Route::put('password', [MobileSecurityController::class, 'updatePassword'])->name('password.update');
+        Route::get('security/status', [MobileSecurityController::class, 'getSecurityStatus'])->name('security.status');
     });
 });
 
