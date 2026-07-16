@@ -10,6 +10,7 @@ use App\Models\FicheMesure;
 use App\Models\User;
 use App\Services\Scan\MeasureCvGateway;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Http;
 
 class MobileGuidedMeasurementSheetController extends Controller
 {
@@ -53,6 +54,21 @@ class MobileGuidedMeasurementSheetController extends Controller
 
             $this->gateway->measure($payload);
         } catch (MeasureCvGatewayException $exception) {
+            $urls = [
+                $request->input('face_url'),
+                $request->input('dos_url'),
+                $request->input('profil_url'),
+            ];
+
+            try {
+                $baseUrl = rtrim((string) config('services.measure_cv.base_url'), '/');
+                Http::timeout(10)->post($baseUrl.'/measure/cleanup', [
+                    'urls' => $urls,
+                ]);
+            } catch (\Throwable $e) {
+                logger()->warning('Cloudinary cleanup failed: {msg}', ['msg' => $e->getMessage()]);
+            }
+
             $sheet->clearMediaCollection('face');
             $sheet->clearMediaCollection('dos');
             $sheet->clearMediaCollection('profil');
