@@ -5,6 +5,10 @@ namespace App\Models\Concerns;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
+/**
+ * Trait qui attribue automatiquement un UUID comme identifiant externe
+ * lors de la creation ou de la sauvegarde d un modele.
+ */
 trait HasExternalId
 {
     protected static function bootHasExternalId(): void

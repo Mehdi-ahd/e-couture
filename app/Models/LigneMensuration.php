@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Modele representant une ligne de mensuration.
+ * Alias plus specifique du modele Mesure, utilise pour la clarte dans certains contextes.
+ */
 class LigneMensuration extends BaseModel
 {
     public $timestamps = false;

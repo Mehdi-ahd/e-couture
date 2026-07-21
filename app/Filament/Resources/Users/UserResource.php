@@ -14,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour la gestion des utilisateurs.
+ * Interface d administration pour les utilisateurs et leurs roles dans le panneau d administration.
+ */
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;

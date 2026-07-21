@@ -2,6 +2,10 @@
 
 namespace App\DTO\Scan;
 
+/**
+ * DTO contenant les options de configuration pour un scan de patron.
+ * Permet de personnaliser la taille, le recadrage et la couleur d arriere plan.
+ */
 final readonly class PatternScanOptions
 {
     public function __construct(

@@ -17,7 +17,7 @@ class GuidedMeasurementSheetRequest extends FormRequest
             'face_url' => ['required', 'url', 'max:2048'],
             'dos_url' => ['required', 'url', 'max:2048'],
             'profil_url' => ['required', 'url', 'max:2048'],
-            'known_height_cm' => ['nullable', 'numeric', 'min:30', 'max:280'],
+            'known_height_cm' => ['required', 'numeric', 'min:30', 'max:280'],
         ];
     }
 }

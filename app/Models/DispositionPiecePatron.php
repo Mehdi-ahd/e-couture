@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Modele representant le placement d une piece de patron sur un materiau.
+ * Definit la position, la rotation, l echelle et l ordre de decoupe.
+ */
 class DispositionPiecePatron extends BaseModel
 {
     protected $table = 'disposition_piece_patrons';

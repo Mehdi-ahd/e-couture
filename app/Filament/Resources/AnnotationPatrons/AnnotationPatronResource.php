@@ -14,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour la gestion des annotations de patrons.
+ * Interface d administration pour les annotations placees sur les pieces de patron.
+ */
 class AnnotationPatronResource extends Resource
 {
     protected static ?string $model = AnnotationPatron::class;

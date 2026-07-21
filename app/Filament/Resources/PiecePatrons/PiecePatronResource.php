@@ -14,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour la gestion des pieces de patron.
+ * Interface d administration pour les pieces individuelles de patrons dans le panneau d administration.
+ */
 class PiecePatronResource extends Resource
 {
     protected static ?string $model = PiecePatron::class;

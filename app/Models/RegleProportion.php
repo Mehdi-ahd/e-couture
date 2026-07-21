@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Modele representant une regle de proportion pour calculer des mesures.
+ * Utilise un coefficient et un offset pour deduire une mesure a partir d une autre.
+ */
 class RegleProportion extends BaseModel
 {
     protected $table = 'regles_proportions';

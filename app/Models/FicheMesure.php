@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+/**
+ * Modele representant une fiche de mesures complete pour un client.
+ * Peut contenir des photos (face, dos, profil) via la bibliotheque Spatie Media Library.
+ */
 class FicheMesure extends BaseModel implements HasMedia
 {
     use InteractsWithMedia;

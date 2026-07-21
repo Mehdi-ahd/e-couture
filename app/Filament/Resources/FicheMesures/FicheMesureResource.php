@@ -14,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour la gestion des fiches de mesures.
+ * Interface d administration pour les fiches de mesures dans le panneau d administration.
+ */
 class FicheMesureResource extends Resource
 {
     protected static ?string $model = FicheMesure::class;

@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * Modele representant un modele de vetement cree par un prestataire.
+ * Lie a un type de vetement, des materiaux, un patron et des commandes.
+ */
 class ModeleVetement extends BaseModel
 {
     protected $table = 'modele_vetements';

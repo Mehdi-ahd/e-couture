@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Mtownsend\RemoveBg\RemoveBg;
 
+/**
+ * Controleur API mobile pour consulter les informations du compte Remove.bg.
+ * Permet de verifier si l API est configuree et d obtenir les details du compte.
+ */
 class MobileRemoveBgAccountController extends Controller
 {
     public function __invoke(): JsonResponse

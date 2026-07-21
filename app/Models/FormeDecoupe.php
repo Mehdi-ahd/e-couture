@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Modele representant une forme de decoupe predefinie.
+ * Peut etre globale ou personnalisee et contient les donnees geometriques de la forme.
+ */
 class FormeDecoupe extends BaseModel
 {
     protected $table = 'formes_decoupe';

@@ -8,6 +8,10 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Spatie\Permission\Models\Role;
 
+/**
+ * Politique d autorisation pour la gestion des roles.
+ * Verifie les permissions via Filament Shield pour chaque action sur les roles.
+ */
 class RolePolicy
 {
     use HandlesAuthorization;

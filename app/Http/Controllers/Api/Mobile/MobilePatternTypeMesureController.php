@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour synchroniser les types de mesures associes a un patron.
+ * Permet de lister et synchroniser les mesures attendues pour un modele de vetement.
+ */
 class MobilePatternTypeMesureController extends Controller
 {
     public function index(Request $request, string $pattern): JsonResponse

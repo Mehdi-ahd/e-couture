@@ -11,6 +11,10 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
+/**
+ * Service d appel a l API Depth Pro pour le scan 3D des patrons.
+ * Envoie une image et recupere les donnees de profondeur et les contours.
+ */
 class DepthProGateway
 {
     public function scanPattern(UploadedFile $image, PatternScanOptions $options): DepthProScanResult

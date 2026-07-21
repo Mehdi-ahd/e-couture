@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/**
+ * Controleur API mobile pour le scan de patrons.
+ * Utilise le service RemoveBg pour traiter les images et generer des decoupes.
+ */
 class MobilePatternScanController extends Controller
 {
     public function __invoke(

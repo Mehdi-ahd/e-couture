@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Modele representant un type de mesure corporelle.
+ * Exemples: tour de poitrine, longueur de manche, tour de taille.
+ */
 class TypeMesure extends BaseModel
 {
     protected $table = 'type_mesures';

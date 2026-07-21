@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Modele representant un client rattache a un prestataire couturier.
+ * Un client possede des fiches de mesures et des commandes de vetements.
+ */
 class Client extends BaseModel
 {
     protected $table = 'clients';

@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Modele representant une mesure associee a un modele de vetement.
+ * Definit les dimensions standards d un modele pour un type de mesure donne.
+ */
 class MesureModele extends BaseModel
 {
     protected $table = 'mesure_modeles';

@@ -20,6 +20,10 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+/**
+ * Fournisseur de services pour le panneau d administration Filament.
+ * Configure le panneau avec les ressources, widgets, plugins et middlewares.
+ */
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel

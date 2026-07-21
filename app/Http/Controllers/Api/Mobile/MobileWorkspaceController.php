@@ -11,6 +11,10 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour le tableau de bord espace de travail.
+ * Fournit les statistiques et les elements recents pour l accueil de l application mobile.
+ */
 class MobileWorkspaceController extends Controller
 {
     public function __invoke(Request $request): JsonResponse

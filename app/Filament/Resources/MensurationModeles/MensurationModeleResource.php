@@ -14,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour la gestion des mensurations des modeles.
+ * Interface d administration pour les mensurations associees aux modeles de vetements.
+ */
 class MensurationModeleResource extends Resource
 {
     protected static ?string $model = MensurationModele::class;

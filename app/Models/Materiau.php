@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Modele representant un materiau utilise en couture.
+ * Peut etre lie a une forme de decoupe et utilise dans plusieurs dispositions de pieces.
+ */
 class Materiau extends BaseModel
 {
     protected $table = 'materiaux';

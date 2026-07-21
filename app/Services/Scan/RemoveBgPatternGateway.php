@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
 
+/**
+ * Service d appel a l API Remove.bg pour le detourage des patrons.
+ * Supprime l arriere plan des images de patrons et genere un fichier PNG avec transparence.
+ */
 class RemoveBgPatternGateway
 {
     public function createCutout(UploadedFile $image, PatternScanOptions $options): RemoveBgPatternScanResult

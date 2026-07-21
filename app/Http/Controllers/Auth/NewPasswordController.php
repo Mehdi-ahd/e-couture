@@ -11,13 +11,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class NewPasswordController extends Controller
 {
     /**
-     * Display the password reset view.
+     * Affiche la page de reinitialisation du mot de passe.
      */
     public function create(Request $request): View
     {
@@ -25,9 +24,7 @@ class NewPasswordController extends Controller
     }
 
     /**
-     * Handle an incoming new password request.
-     *
-     * @throws ValidationException
+     * Traite une demande de nouveau mot de passe.
      */
     public function store(Request $request): RedirectResponse
     {

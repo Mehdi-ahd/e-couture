@@ -7,6 +7,10 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 
+/**
+ * Service d appel a l API Measure CV pour la prise de mesures guidee.
+ * Envoie des photos sous plusieurs angles et recupere les mesures calculees.
+ */
 class MeasureCvGateway
 {
     public function measure(array $payload): array

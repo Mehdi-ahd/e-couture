@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Modele representant un compte de connexion sociale lie a un utilisateur.
+ * Supporte les providers comme Google, Facebook, Apple via Laravel Socialite.
+ */
 class SocialAccount extends BaseModel
 {
     protected $fillable = [

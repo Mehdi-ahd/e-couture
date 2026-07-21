@@ -7,6 +7,10 @@ use App\Models\FormeDecoupe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour la gestion des formes de decoupe.
+ * Permet de creer, modifier et supprimer les formes utilisees dans les dispositions de pieces.
+ */
 class MobileFormeDecoupeController extends Controller
 {
     public function index(): JsonResponse
@@ -102,7 +106,7 @@ class MobileFormeDecoupeController extends Controller
             'est_global' => ['sometimes', 'boolean'],
         ]);
     }
-
+    
     private function serializeItem(FormeDecoupe $item): array
     {
         return [

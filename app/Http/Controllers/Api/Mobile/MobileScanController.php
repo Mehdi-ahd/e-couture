@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * Controleur API mobile pour le scan generique d images.
+ * Permet de televerser des photos depuis l application mobile vers le stockage.
+ */
 class MobileScanController extends Controller
 {
     public function __invoke(Request $request): JsonResponse

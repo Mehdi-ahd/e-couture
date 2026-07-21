@@ -12,6 +12,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour la gestion des pieces d un patron.
+ * Permet d ajouter, modifier, supprimer des pièces et de gerer leurs dispositions.
+ */
 class MobilePatternPieceController extends Controller
 {
     public function index(Request $request, string $pattern): JsonResponse

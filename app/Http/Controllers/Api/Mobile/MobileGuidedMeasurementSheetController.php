@@ -12,6 +12,10 @@ use App\Services\Scan\MeasureCvGateway;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 
+/**
+ * Controleur API mobile pour la prise de mesures guidee par scan.
+ * Utilise le service MeasureCV pour analyser les photos et generer les mesures automatiquement.
+ */
 class MobileGuidedMeasurementSheetController extends Controller
 {
     public function __construct(
@@ -46,11 +50,8 @@ class MobileGuidedMeasurementSheetController extends Controller
                 'face_url' => $request->input('face_url'),
                 'dos_url' => $request->input('dos_url'),
                 'profil_url' => $request->input('profil_url'),
+                'known_height_cm' => (float) $request->input('known_height_cm'),
             ];
-
-            if ($request->has('known_height_cm')) {
-                $payload['known_height_cm'] = (float) $request->input('known_height_cm');
-            }
 
             $this->gateway->measure($payload);
         } catch (MeasureCvGatewayException $exception) {

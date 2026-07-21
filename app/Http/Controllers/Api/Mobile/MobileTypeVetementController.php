@@ -8,6 +8,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+/**
+ * Controleur API mobile pour la gestion des types de vetements.
+ * Permet de creer, modifier et supprimer les categories de vetements.
+ */
 class MobileTypeVetementController extends Controller
 {
     public function index(): JsonResponse

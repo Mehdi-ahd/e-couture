@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
+/**
+ * Controleur pour synchroniser l authentification depuis l application mobile.
+ * Cree ou met a jour un utilisateur via son identifiant externe, email ou compte social,
+ * et retourne un jeton d acces Sanctum.
+ */
 class MobileAuthSyncController extends Controller
 {
     public function __invoke(Request $request): JsonResponse

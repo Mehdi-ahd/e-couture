@@ -8,6 +8,10 @@ use App\Models\TypeMesure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour la gestion des regles de proportion.
+ * Permet de definir et gerer les regles de calcul entre differentes mesures.
+ */
 class MobileRegleProportionController extends Controller
 {
     public function index(): JsonResponse

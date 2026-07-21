@@ -12,6 +12,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour la gestion des patrons de couture.
+ * Permet de lister, creer, consulter, modifier et archiver les patrons.
+ */
 class MobilePatternController extends Controller
 {
     public function index(Request $request): JsonResponse

@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour la gestion des clients.
+ * Permet de lister, creer, consulter, modifier et archiver les clients d un prestataire.
+ */
 class MobileClientController extends Controller
 {
     public function index(Request $request): JsonResponse

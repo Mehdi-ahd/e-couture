@@ -14,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour la gestion des types de vetements.
+ * Interface d administration pour les categories de vetements dans le panneau d administration.
+ */
 class TypeVetementResource extends Resource
 {
     protected static ?string $model = TypeVetement::class;

@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Modele representant une mesure individuelle prise sur un client.
+ * Liee a une fiche de mesures et a un type de mesure.
+ */
 class Mesure extends Model
 {
     use HasFactory;

@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Affiche la page de connexion.
      */
     public function create(): View
     {
@@ -20,7 +20,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Traite une demande d authentification.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
@@ -32,7 +32,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Destroy an authenticated session.
+     * Detruit la session authentifiee.
      */
     public function destroy(Request $request): RedirectResponse
     {

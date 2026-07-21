@@ -14,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour la gestion des patrons de couture.
+ * Interface d administration pour les patrons dans le panneau d administration.
+ */
 class PatronResource extends Resource
 {
     protected static ?string $model = Patron::class;

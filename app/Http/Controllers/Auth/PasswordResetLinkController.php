@@ -6,13 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class PasswordResetLinkController extends Controller
 {
     /**
-     * Display the password reset link request view.
+     * Affiche la page de demande de lien de reinitialisation.
      */
     public function create(): View
     {
@@ -20,9 +19,7 @@ class PasswordResetLinkController extends Controller
     }
 
     /**
-     * Handle an incoming password reset link request.
-     *
-     * @throws ValidationException
+     * Traite une demande de lien de reinitialisation du mot de passe.
      */
     public function store(Request $request): RedirectResponse
     {

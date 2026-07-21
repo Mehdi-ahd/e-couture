@@ -8,6 +8,10 @@ use App\Models\Materiau;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour la gestion des materiaux.
+ * Permet de creer, modifier et supprimer les materiaux utilisables dans les patrons.
+ */
 class MobileMateriauController extends Controller
 {
     public function index(): JsonResponse
