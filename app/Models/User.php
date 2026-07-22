@@ -20,6 +20,11 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * Modele representant un utilisateur de l application.
+ * Un utilisateur peut etre administrateur, couturier ou client.
+ * Gerent l authentification, les roles, les permissions et l acces au panneau Filament.
+ */
 class User extends Authenticatable implements FilamentHasName, FilamentUser, MustVerifyEmailContract
 {
     public const ROLE_ADMINISTRATEUR = 'administrateur';

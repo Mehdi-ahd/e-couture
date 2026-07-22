@@ -5,6 +5,9 @@ namespace App\Exceptions\Scan;
 use RuntimeException;
 use Throwable;
 
+/**
+ * Exception levee lors d un echec de communication avec l API Measure CV.
+ */
 class MeasureCvGatewayException extends RuntimeException
 {
     public function __construct(

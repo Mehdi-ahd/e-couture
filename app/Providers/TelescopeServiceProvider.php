@@ -8,6 +8,10 @@ use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
 
+/**
+ * Fournisseur de services pour Laravel Telescope.
+ * Configure le debogage et le monitoring de l application.
+ */
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {
     /**

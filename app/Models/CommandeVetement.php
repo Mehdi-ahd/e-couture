@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Modele representant une commande de vetement passée par un client.
+ * Liee a un modele de vetement et a une fiche de mesures specifique.
+ */
 class CommandeVetement extends BaseModel
 {
     protected $table = 'commande_vetements';

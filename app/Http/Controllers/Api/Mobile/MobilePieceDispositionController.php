@@ -12,6 +12,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour la gestion des dispositions de pieces sur les materiaux.
+ * Permet de placer, modifier et supprimer les positions des pieces sur les formes de decoupe.
+ */
 class MobilePieceDispositionController extends Controller
 {
     public function index(Request $request, string $piece): JsonResponse

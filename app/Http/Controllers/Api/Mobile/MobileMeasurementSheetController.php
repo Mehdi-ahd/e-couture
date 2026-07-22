@@ -12,6 +12,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Controleur API mobile pour la gestion des fiches de mesures.
+ * Permet de creer, modifier, valider et supprimer les fiches de mesures d un client.
+ */
 class MobileMeasurementSheetController extends Controller
 {
     public function index(Request $request, string $client): JsonResponse

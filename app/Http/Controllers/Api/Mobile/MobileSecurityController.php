@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Controleur API mobile pour la securite du compte.
+ * Gere la verification par email et telephone, l authentification a deux facteurs,
+ * la gestion des sessions et la modification du mot de passe.
+ */
 class MobileSecurityController extends Controller
 {
     private const CODE_EXPIRY_MINUTES = 10;

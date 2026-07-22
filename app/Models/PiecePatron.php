@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Modele representant une piece individuelle d un patron de couture.
+ * Chaque piece contient des donnees geometriques et peut avoir des annotations.
+ */
 class PiecePatron extends BaseModel
 {
     protected $table = 'piece_patrons';

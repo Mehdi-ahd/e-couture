@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Modele representant un patron de couture lie a un modele de vetement.
+ * Contient les donnees de dessin et les versions du patron.
+ */
 class Patron extends BaseModel
 {
     protected $table = 'patrons';

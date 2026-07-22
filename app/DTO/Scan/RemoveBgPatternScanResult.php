@@ -2,6 +2,10 @@
 
 namespace App\DTO\Scan;
 
+/**
+ * DTO contenant le resultat du detourage via Remove.bg.
+ * Contient les URLs et metadonnees de l image source et du cutout genere.
+ */
 final readonly class RemoveBgPatternScanResult
 {
     public function __construct(public array $payload) {}

@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Modele representant une annotation placee sur une piece de patron.
+ * Indique une mesure avec sa position de depart et de fin ainsi que son orientation.
+ */
 class AnnotationPatron extends BaseModel
 {
     protected $table = 'annotation_patrons';

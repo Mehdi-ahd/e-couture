@@ -7,6 +7,10 @@ use App\Models\TypeMesure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour la gestion des types de mesures.
+ * Permet de creer, modifier et supprimer les types de mesures corporelles.
+ */
 class MobileTypeMesureController extends Controller
 {
     public function index(): JsonResponse

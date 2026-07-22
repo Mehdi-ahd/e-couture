@@ -12,6 +12,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour la gestion des commandes de vetements.
+ * Permet de creer, modifier, archiver et suivre les commandes liees a un client.
+ */
 class MobileOrderController extends Controller
 {
     public function index(Request $request, string $client): JsonResponse

@@ -9,6 +9,10 @@ use App\Models\TypeMesure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour la gestion des annotations sur les pieces de patron.
+ * Permet de lier des types de mesures avec des positions sur une piece de patron.
+ */
 class MobileAnnotationPatronController extends Controller
 {
     public function index(string $piece): JsonResponse

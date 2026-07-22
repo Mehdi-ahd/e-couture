@@ -16,6 +16,10 @@ use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as ProviderUser;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
+/**
+ * Controleur d authentification via les reseaux sociaux.
+ * Utilise Laravel Socialite pour les connexions Google, Facebook, etc.
+ */
 class SocialAuthController extends Controller
 {
     public function redirect(string $provider): JsonResponse

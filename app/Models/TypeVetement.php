@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Modele representant une categorie ou un type de vetement.
+ * Exemples: robe, pantalon, veste, chemise.
+ */
 class TypeVetement extends BaseModel
 {
     protected $table = 'type_vetements';

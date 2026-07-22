@@ -7,6 +7,10 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Controleur API mobile pour marquer la fin du parcours d onboarding.
+ * Met a jour la date de completion de l onboarding pour l utilisateur.
+ */
 class MobileOnboardingController extends Controller
 {
     public function __invoke(Request $request): JsonResponse

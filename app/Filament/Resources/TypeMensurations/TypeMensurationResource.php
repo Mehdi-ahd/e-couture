@@ -14,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour la gestion des types de mensurations.
+ * Interface d administration pour les types de mesures corporelles dans le panneau d administration.
+ */
 class TypeMensurationResource extends Resource
 {
     protected static ?string $model = TypeMesure::class;

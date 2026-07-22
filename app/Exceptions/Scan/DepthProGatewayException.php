@@ -5,6 +5,9 @@ namespace App\Exceptions\Scan;
 use RuntimeException;
 use Throwable;
 
+/**
+ * Exception levee lors d un echec de communication avec l API Depth Pro.
+ */
 class DepthProGatewayException extends RuntimeException
 {
     public function __construct(

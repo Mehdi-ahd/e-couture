@@ -14,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
+/**
+ * Ressource Filament pour la gestion des regles de proportion.
+ * Interface d administration pour les regles de calcul de mesures dans le panneau d administration.
+ */
 class RegleProportionResource extends Resource
 {
     protected static ?string $model = RegleProportion::class;

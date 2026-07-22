@@ -19,6 +19,10 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Controleur d authentification pour l API.
+ * Gere l inscription, la connexion, la deconnexion, le profil et l authentification sociale.
+ */
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request): JsonResponse
