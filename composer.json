@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.3",
         "bezhansalleh/filament-shield": "^4.2",
+        "cocouvi/x-mongo-gen": "^1.0",
         "dedoc/scramble": "^0.13.21",
         "filament/filament": "^4.0",
         "kreait/laravel-firebase": "^7.1",
