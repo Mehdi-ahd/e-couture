@@ -106,7 +106,7 @@ class MobileFormeDecoupeController extends Controller
             'est_global' => ['sometimes', 'boolean'],
         ]);
     }
-    
+
     private function serializeItem(FormeDecoupe $item): array
     {
         return [

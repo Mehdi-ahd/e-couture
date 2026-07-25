@@ -61,6 +61,10 @@ class MobilePatternTypeMesureController extends Controller
         $validated = $request->validate([
             'type_mesure_ids' => ['required', 'array'],
             'type_mesure_ids.*' => ['required', 'string', 'exists:type_mesures,external_id'],
+            'values' => ['nullable', 'array'],
+            'values.*.external_id' => ['required_with:values', 'string', 'exists:type_mesures,external_id'],
+            'values.*.valeur' => ['nullable', 'numeric', 'min:0', 'max:9999.99'],
+            'values.*.notes' => ['nullable', 'string', 'max:500'],
         ]);
 
         $resolvedIds = TypeMesure::query()
@@ -90,6 +94,27 @@ class MobilePatternTypeMesureController extends Controller
                     'type_mesure_id' => $typeMesureId,
                     'valeur' => null,
                 ]);
+            }
+        }
+
+        if (! empty($validated['values'])) {
+            $externalToInternal = TypeMesure::query()
+                ->whereIn('external_id', collect($validated['values'])->pluck('external_id'))
+                ->pluck('id', 'external_id');
+
+            foreach ($validated['values'] as $valueItem) {
+                $internalTypeId = $externalToInternal[$valueItem['external_id']] ?? null;
+                if ($internalTypeId === null) {
+                    continue;
+                }
+
+                MesureModele::query()
+                    ->where('modele_vetement_id', $modele->id)
+                    ->where('type_mesure_id', $internalTypeId)
+                    ->update([
+                        'valeur' => $valueItem['valeur'] ?? null,
+                        'notes' => $valueItem['notes'] ?? null,
+                    ]);
             }
         }
 

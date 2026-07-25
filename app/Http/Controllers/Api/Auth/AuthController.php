@@ -30,6 +30,7 @@ class AuthController extends Controller
         $user = User::create([
             'nom' => $request->string('nom')->toString(),
             'prenom' => $request->string('prenom')->toString(),
+            'sexe' => $request->string('sexe')->toString(),
             'telephone' => $request->string('telephone')->toString(),
             'email' => $request->string('email')->lower()->toString(),
             'password' => Hash::make($request->string('password')->toString()),
@@ -251,6 +252,7 @@ class AuthController extends Controller
             'external_id' => $user->external_id,
             'nom' => $user->nom,
             'prenom' => $user->prenom,
+            'sexe' => $user->sexe ?? 'autre',
             'full_name' => $user->full_name,
             'email' => $user->email,
             'telephone' => $user->telephone,

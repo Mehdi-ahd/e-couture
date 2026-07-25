@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\Mobile;
 
 use App\Http\Controllers\Controller;
+use App\Models\MesureModele;
 use App\Models\ModeleVetement;
 use App\Models\Patron;
 use App\Models\PiecePatron;
+use App\Models\TypeMesure;
 use App\Models\TypeVetement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -79,6 +81,8 @@ class MobilePatternController extends Controller
             'statut' => $validated['statut'] ?? 'brouillon',
             'modele_vetement_id' => $modele->id,
         ]);
+
+        $this->syncModelTypeMesures($modele, $validated);
 
         $pattern = $this->baseQueryForUser($user)
             ->whereKey($pattern->getKey())
@@ -172,6 +176,10 @@ class MobilePatternController extends Controller
             'statut' => $validated['statut'] ?? $record->statut,
         ])->save();
 
+        if ($record->modeleVetement !== null) {
+            $this->syncModelTypeMesures($record->modeleVetement, $validated);
+        }
+
         $record = $this->baseQueryForUser($user)
             ->whereKey($record->getKey())
             ->firstOrFail();
@@ -210,6 +218,7 @@ class MobilePatternController extends Controller
             })
             ->with([
                 'modeleVetement.typeVetement',
+                'modeleVetement.mesureModeles.typeMesure',
                 'piecesPatrons.dispositions',
             ]);
     }
@@ -226,6 +235,7 @@ class MobilePatternController extends Controller
         return $this->baseQueryForUser($user)
             ->where('external_id', $externalId)
             ->with([
+                'modeleVetement.mesureModeles.typeMesure',
                 'piecesPatrons.dispositions.materiau',
                 'piecesPatrons.dispositions.formeDecoupe',
             ])
@@ -257,6 +267,8 @@ class MobilePatternController extends Controller
             'donnees_dessin' => ['nullable', 'array'],
             'donnees_dessin_v2' => ['nullable', 'string'],
             'statut' => ['sometimes', 'string', 'max:40'],
+            'type_mesure_ids' => ['nullable', 'array'],
+            'type_mesure_ids.*' => ['string', 'exists:type_mesures,external_id'],
         ]);
     }
 
@@ -291,6 +303,9 @@ class MobilePatternController extends Controller
             'pieces_label' => sprintf('%d pièce%s', $pieceCount, $pieceCount > 1 ? 's' : ''),
             'materials_label' => sprintf('%d matériau%s', $materialCount, $materialCount > 1 ? 'x' : ''),
             'fichier_url' => $pattern->fichier_url,
+            'type_mesures' => $pattern->modeleVetement !== null
+                ? $this->serializeTypeMesures($pattern->modeleVetement)
+                : [],
             'is_editable' => $isEditable,
             'updated_label' => $pattern->created_at?->format('d/m/Y') ?? 'A jour',
             'model' => [
@@ -324,6 +339,37 @@ class MobilePatternController extends Controller
         ];
     }
 
+    private function syncModelTypeMesures(ModeleVetement $modele, array $validated): void
+    {
+        if (! isset($validated['type_mesure_ids']) || ! is_array($validated['type_mesure_ids'])) {
+            return;
+        }
+
+        $resolvedIds = TypeMesure::query()
+            ->whereIn('external_id', $validated['type_mesure_ids'])
+            ->pluck('id');
+
+        MesureModele::query()
+            ->where('modele_vetement_id', $modele->id)
+            ->whereNotIn('type_mesure_id', $resolvedIds)
+            ->delete();
+
+        $existingIds = MesureModele::query()
+            ->where('modele_vetement_id', $modele->id)
+            ->pluck('type_mesure_id')
+            ->toArray();
+
+        foreach ($resolvedIds as $typeMesureId) {
+            if (! in_array($typeMesureId, $existingIds, true)) {
+                MesureModele::query()->create([
+                    'modele_vetement_id' => $modele->id,
+                    'type_mesure_id' => $typeMesureId,
+                    'valeur' => null,
+                ]);
+            }
+        }
+    }
+
     private function mapStatusTone(string $status): string
     {
         return match ($status) {
@@ -331,5 +377,26 @@ class MobilePatternController extends Controller
             'archive' => 'warning',
             default => 'info',
         };
+    }
+
+    private function serializeTypeMesures(ModeleVetement $modele): array
+    {
+        if ($modele->relationLoaded('mesureModeles')) {
+            return $modele->mesureModeles
+                ->map(fn (MesureModele $mm) => [
+                    'external_id' => $mm->external_id,
+                    'type_mesure_external_id' => $mm->typeMesure?->external_id,
+                    'type_mesure_code' => $mm->typeMesure?->code,
+                    'type_mesure_nom' => $mm->typeMesure?->nom,
+                    'type_mesure_unite' => $mm->typeMesure?->unite,
+                    'type_mesure_categorie' => $mm->typeMesure?->categorie,
+                    'valeur' => $mm->valeur,
+                    'notes' => $mm->notes,
+                ])
+                ->values()
+                ->all();
+        }
+
+        return [];
     }
 }
