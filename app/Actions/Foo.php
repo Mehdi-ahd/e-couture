@@ -2,10 +2,7 @@
 
 namespace App\Actions;
 
-/**
- * Action placeholder pour les traitements specifiques.
- */
-class Xandro
+class Foo
 {
     public function handle()
     {
