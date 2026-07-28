@@ -14,6 +14,7 @@ return [
             'type_vetements' => null, // null = all
             'type_mesures' => null,
             'patrons' => 20,
+            'mesure_modeles' => 50,
         ],
         'sync' => [
             'clients' => 100,
@@ -22,6 +23,7 @@ return [
             'fiche_mesures' => 100,
             'mesures' => 200,
             'patrons' => 100,
+            'mesure_modeles' => 200,
         ],
     ],
 
@@ -33,7 +35,8 @@ return [
         5 => 'fiche_mesures',
         6 => 'mesures',
         7 => 'patrons',
-        8 => 'type_vetements',
-        9 => 'type_mesures',
+        8 => 'mesure_modeles',
+        9 => 'type_vetements',
+        10 => 'type_mesures',
     ],
 ];

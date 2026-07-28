@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -16,6 +17,7 @@ class TypeVetement extends BaseModel
         'code',
         'nom',
         'description',
+        'categorie',
         'est_actif',
     ];
 
@@ -29,5 +31,12 @@ class TypeVetement extends BaseModel
     public function modelesVetements(): HasMany
     {
         return $this->hasMany(ModeleVetement::class, 'type_vetement_id');
+    }
+
+    public function typeMesures(): BelongsToMany
+    {
+        return $this->belongsToMany(TypeMesure::class, 'type_vetement_mesures', 'type_vetement_id', 'type_mesure_id')
+            ->withPivot('est_obligatoire')
+            ->withTimestamps();
     }
 }

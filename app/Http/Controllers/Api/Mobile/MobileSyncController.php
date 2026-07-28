@@ -7,8 +7,10 @@ use App\Models\Client;
 use App\Models\CommandeVetement;
 use App\Models\FicheMesure;
 use App\Models\Mesure;
+use App\Models\MesureModele;
 use App\Models\ModeleVetement;
 use App\Models\Patron;
+use App\Models\PiecePatron;
 use App\Models\TypeMesure;
 use App\Models\TypeVetement;
 use App\Models\User;
@@ -25,9 +27,12 @@ class MobileSyncController extends Controller
 
     private array $entityConfig = [];
 
+    private array $relationResolvers = [];
+
     public function __construct()
     {
         $this->entityConfig = [
+
             'clients' => [
                 'model' => Client::class,
                 'scope' => fn (Builder $q, int $userId) => $q->where('prestataire_id', $userId),
@@ -37,7 +42,7 @@ class MobileSyncController extends Controller
             ],
             'modele_vetements' => [
                 'model' => ModeleVetement::class,
-                'scope' => fn (Builder $q, int $userId) => $q->where('prestataire_id', $userId),
+                'scope' => fn (Builder $q, int $userId) => $q,
                 'with' => ['typeVetement'],
                 'bootstrap_size' => config('sync.page_sizes.bootstrap.modele_vetements', 20),
                 'sync_size' => config('sync.page_sizes.sync.modele_vetements', 100),
@@ -65,10 +70,52 @@ class MobileSyncController extends Controller
             ],
             'patrons' => [
                 'model' => Patron::class,
-                'scope' => fn (Builder $q, int $userId) => $q->whereHas('modeleVetement', fn (Builder $m) => $m->where('prestataire_id', $userId)),
+                'scope' => fn (Builder $q, int $userId) => $q,
                 'with' => ['modeleVetement'],
                 'bootstrap_size' => config('sync.page_sizes.bootstrap.patrons', 20),
                 'sync_size' => config('sync.page_sizes.sync.patrons', 100),
+            ],
+            'piece_patrons' => [
+                'model' => PiecePatron::class,
+                'scope' => fn (Builder $q, int $userId) => $q,
+                'with' => [],
+                'bootstrap_size' => config('sync.page_sizes.bootstrap.piece_patrons', 50),
+                'sync_size' => config('sync.page_sizes.sync.piece_patrons', 200),
+            ],
+            'mesure_modeles' => [
+                'model' => MesureModele::class,
+                'scope' => fn (Builder $q, int $userId) => $q->whereHas('modeleVetement', fn (Builder $m) => $m->where('prestataire_id', $userId)),
+                'with' => ['typeMesure'],
+                'bootstrap_size' => config('sync.page_sizes.bootstrap.mesure_modeles', 50),
+                'sync_size' => config('sync.page_sizes.sync.mesure_modeles', 200),
+            ],
+        ];
+
+        $this->relationResolvers = [
+            'commande_vetements' => [
+                'client_id' => ['model' => Client::class, 'field' => 'client_id'],
+                'modele_vetement_id' => ['model' => ModeleVetement::class, 'field' => 'modele_vetement_id'],
+                'fiche_mesure_id' => ['model' => FicheMesure::class, 'field' => 'fiche_mesure_id'],
+            ],
+            'modele_vetements' => [
+                'type_vetement_id' => ['model' => TypeVetement::class, 'field' => 'type_vetement_id'],
+            ],
+            'fiche_mesures' => [
+                'client_id' => ['model' => Client::class, 'field' => 'client_id'],
+            ],
+            'mesures' => [
+                'fiche_id' => ['model' => FicheMesure::class, 'field' => 'fiche_mesure_id'],
+                'type_mesure_external_id' => ['model' => TypeMesure::class, 'field' => 'type_mesure_id'],
+            ],
+            'patrons' => [
+                'modele_vetement_id' => ['model' => ModeleVetement::class, 'field' => 'modele_vetement_id'],
+            ],
+            'piece_patrons' => [
+                'patron_id' => ['model' => Patron::class, 'field' => 'patron_id'],
+            ],
+            'mesure_modeles' => [
+                'modele_vetement_id' => ['model' => ModeleVetement::class, 'field' => 'modele_vetement_id'],
+                'type_mesure_external_id' => ['model' => TypeMesure::class, 'field' => 'type_mesure_id'],
             ],
         ];
     }
@@ -260,6 +307,8 @@ class MobileSyncController extends Controller
             return [
                 'mutation_id' => $mutationId,
                 'uuid' => $data['external_id'] ?? null,
+                'external_id' => $data['external_id'] ?? null,
+                'server_id' => $data['external_id'] ?? null,
                 'status' => 'duplicate',
             ];
         }
@@ -286,6 +335,8 @@ class MobileSyncController extends Controller
         $modelClass = $config['model'];
         $uuid = $data['external_id'] ?? null;
 
+        $data = $this->resolveRelationIds($entity, $data);
+
         try {
             match ($action) {
                 'create' => $this->applyCreate($modelClass, $data, $user),
@@ -309,18 +360,33 @@ class MobileSyncController extends Controller
             'updated_at' => now(),
         ]);
 
+        $serverId = null;
+        try {
+            $serverId = $modelClass::query()->where('external_id', $uuid)->value('id');
+        } catch (\Throwable) {
+            // Not all models have an 'id' column accessible this way — safe to ignore.
+        }
+
         return [
             'mutation_id' => $mutationId,
             'uuid' => $uuid,
-            'status' => 'applied',
+            'external_id' => $uuid,
+            'server_id' => $serverId,
+            'status' => 'completed',
         ];
     }
 
     private function applyCreate(string $modelClass, array $data, User $user): void
     {
-        $instance = new $modelClass;
+        unset($data['id']);
 
         $data['external_id'] ??= (string) Str::uuid();
+
+        if ($modelClass::query()->where('external_id', $data['external_id'])->exists()) {
+            return;
+        }
+
+        $instance = new $modelClass;
 
         if (in_array('prestataire_id', $instance->getFillable(), true)) {
             $data['prestataire_id'] = $user->id;
@@ -387,6 +453,62 @@ class MobileSyncController extends Controller
         } else {
             $instance->forceDelete();
         }
+    }
+
+    private function resolveRelationIds(string $entity, array $data): array
+    {
+        $resolvers = $this->relationResolvers[$entity] ?? [];
+
+        // Field name normalisation — map Flutter field names to Laravel column names
+        $data = match ($entity) {
+            'commande_vetements' => self::mapFields($data, [
+                'status' => 'statut',
+                'due_date' => 'date_livraison',
+            ]),
+            'modele_vetements' => self::mapFields($data, [
+                'modele_statut' => 'statut',
+                'type_vetement_id' => 'type_vetement_id', // keep it, resolved below
+            ]),
+            'fiche_mesures' => self::mapFields($data, [
+                'status' => 'statut',
+            ]),
+            'clients' => self::mapFields($data, [
+                'sexe' => 'genre',
+            ]),
+            default => $data,
+        };
+
+        foreach ($resolvers as $incomingKey => $target) {
+            $value = $data[$incomingKey] ?? null;
+
+            if ($value === null || is_numeric($value) || ! is_string($value)) {
+                continue;
+            }
+
+            $pk = $target['model']::query()
+                ->where('external_id', $value)
+                ->value('id');
+
+            if ($pk !== null) {
+                $data[$target['field']] = $pk;
+            }
+
+            unset($data[$incomingKey]);
+        }
+
+        return $data;
+    }
+
+    private static function mapFields(array $data, array $mapping): array
+    {
+        foreach ($mapping as $from => $to) {
+            if (array_key_exists($from, $data) && $from !== $to) {
+                $data[$to] = $data[$from];
+                unset($data[$from]);
+            }
+        }
+
+        return $data;
     }
 
     private static function deltaQuery(string $modelClass, ?callable $scope, string $since): array

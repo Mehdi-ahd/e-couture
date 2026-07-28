@@ -17,6 +17,8 @@ class FicheMesure extends BaseModel implements HasMedia
 
     protected $table = 'fiche_mesures';
 
+    protected $appends = ['client_external_id'];
+
     protected $fillable = [
         'client_id',
         'date',
@@ -30,6 +32,11 @@ class FicheMesure extends BaseModel implements HasMedia
             'date' => 'date',
             'validee' => 'boolean',
         ];
+    }
+
+    public function getClientExternalIdAttribute(): ?string
+    {
+        return $this->client?->external_id;
     }
 
     public function client(): BelongsTo

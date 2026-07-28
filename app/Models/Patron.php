@@ -15,6 +15,8 @@ class Patron extends BaseModel
 
     public $timestamps = false;
 
+    protected $appends = ['modele_external_id'];
+
     protected $fillable = [
         'modele_vetement_id',
         'methode',
@@ -34,6 +36,11 @@ class Patron extends BaseModel
             'donnees_dessin_v2' => 'string',
             'created_at' => 'datetime',
         ];
+    }
+
+    public function getModeleExternalIdAttribute(): ?string
+    {
+        return $this->modeleVetement?->external_id;
     }
 
     public function getVersionLabelAttribute(): string

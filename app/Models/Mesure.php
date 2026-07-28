@@ -8,12 +8,24 @@ class Mesure extends BaseModel
 {
     protected $table = 'mesures';
 
+    protected $appends = ['fiche_external_id', 'type_mesure_external_id'];
+
     protected function casts(): array
     {
         return [
             'valeur' => 'decimal:2',
             'confiance' => 'decimal:4',
         ];
+    }
+
+    public function getFicheExternalIdAttribute(): ?string
+    {
+        return $this->ficheMesure?->external_id;
+    }
+
+    public function getTypeMesureExternalIdAttribute(): ?string
+    {
+        return $this->typeMesure?->external_id;
     }
 
     public function ficheMesure(): BelongsTo

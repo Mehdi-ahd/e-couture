@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('genre')->nullable(); // homme, femme, autre
             $table->date('date_naissance')->nullable();
+            $table->text('adresse')->nullable();
+            $table->string('photo_url')->nullable();
+            $table->text('notes')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
             // date_creation kept for compatibility with previous `fiches_clients`
             $table->timestamp('date_creation')->useCurrent();
             $table->boolean('est_actif')->default(true);

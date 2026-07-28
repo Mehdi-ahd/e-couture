@@ -12,6 +12,8 @@ class CommandeVetement extends BaseModel
 {
     protected $table = 'commande_vetements';
 
+    protected $appends = ['client_external_id', 'modele_external_id'];
+
     protected $fillable = [
         'client_id',
         'modele_vetement_id',
@@ -21,6 +23,16 @@ class CommandeVetement extends BaseModel
         'date_commande',
         'date_livraison',
     ];
+
+    public function getClientExternalIdAttribute(): ?string
+    {
+        return $this->client?->external_id;
+    }
+
+    public function getModeleExternalIdAttribute(): ?string
+    {
+        return $this->modeleVetement?->external_id;
+    }
 
     protected function casts(): array
     {

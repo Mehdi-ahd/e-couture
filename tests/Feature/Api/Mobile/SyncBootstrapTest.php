@@ -125,7 +125,7 @@ test('push creates and tracks mutation_id for idempotency', function () {
         ]);
 
     $response->assertOk();
-    expect($response->json('data.results.0.status'))->toBe('applied');
+    expect($response->json('data.results.0.status'))->toBe('completed');
 
     $client = Client::where('nom', 'Test Client')->first();
     expect($client)->not->toBeNull();

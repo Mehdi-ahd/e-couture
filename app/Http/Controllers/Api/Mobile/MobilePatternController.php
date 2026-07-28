@@ -208,19 +208,11 @@ class MobilePatternController extends Controller
 
     private function baseQueryForUser(User $user): Builder
     {
-        return Patron::query()
-            ->whereHas('modeleVetement', function ($query) use ($user): void {
-                $query->where(function ($subQuery) use ($user): void {
-                    $subQuery
-                        ->whereNull('prestataire_id')
-                        ->orWhere('prestataire_id', $user->id);
-                });
-            })
-            ->with([
-                'modeleVetement.typeVetement',
-                'modeleVetement.mesureModeles.typeMesure',
-                'piecesPatrons.dispositions',
-            ]);
+        return Patron::query()->with([
+            'modeleVetement.typeVetement',
+            'modeleVetement.mesureModeles.typeMesure',
+            'piecesPatrons.dispositions',
+        ]);
     }
 
     private function findForUser(User $user, string $externalId): Patron

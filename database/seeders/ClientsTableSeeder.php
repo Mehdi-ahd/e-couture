@@ -10,18 +10,19 @@ class ClientsTableSeeder extends Seeder
 {
     public function run(): void
     {
-        // For each prestataire (role couturier) create two clients
         $prestataires = User::query()->role(User::ROLE_COUTURIER)->get();
 
         $beninClients = [
-            ['nom' => 'Kodjo', 'prenom' => 'Brice'],
-            ['nom' => 'Kouton', 'prenom' => 'Marie'],
-            ['nom' => 'Agan', 'prenom' => 'Rachelle'],
-            ['nom' => 'Bankole', 'prenom' => 'Pascal'],
-            ['nom' => 'Dossou', 'prenom' => 'Aicha'],
-            ['nom' => 'Tognon', 'prenom' => 'Henri'],
-            ['nom' => 'Soglo', 'prenom' => 'Monique'],
-            ['nom' => 'Kouassi', 'prenom' => 'David'],
+            ['nom' => 'Kodjo',    'prenom' => 'Brice',   'genre' => 'homme'],
+            ['nom' => 'Kouton',   'prenom' => 'Marie',   'genre' => 'femme'],
+            ['nom' => 'Agan',     'prenom' => 'Rachelle', 'genre' => 'femme'],
+            ['nom' => 'Bankole',  'prenom' => 'Pascal',  'genre' => 'homme'],
+            ['nom' => 'Dossou',   'prenom' => 'Aicha',   'genre' => 'femme'],
+            ['nom' => 'Tognon',   'prenom' => 'Henri',   'genre' => 'homme'],
+            ['nom' => 'Soglo',    'prenom' => 'Monique', 'genre' => 'femme'],
+            ['nom' => 'Kouassi',  'prenom' => 'David',   'genre' => 'homme'],
+            ['nom' => 'Hounsou',  'prenom' => 'Gisèle',  'genre' => 'femme'],
+            ['nom' => 'Assogba',  'prenom' => 'Marc',    'genre' => 'homme'],
         ];
 
         $i = 0;
@@ -29,19 +30,16 @@ class ClientsTableSeeder extends Seeder
             for ($n = 0; $n < 2; $n++) {
                 $entry = $beninClients[$i % count($beninClients)];
                 Client::query()->updateOrCreate(
-                    [
-                        'telephone' => sprintf('+22990%06d', 100 + $i),
-                    ],
+                    ['telephone' => sprintf('+22990%06d', 100 + $i)],
                     [
                         'nom' => $entry['nom'],
                         'prenom' => $entry['prenom'],
                         'email' => strtolower($entry['prenom']).'.'.strtolower($entry['nom']).'@example.bj',
+                        'genre' => $entry['genre'],
                         'prestataire_id' => $prestataire->id,
-                        'genre' => $i % 2 === 0 ? 'feminin' : 'masculin',
                         'est_actif' => true,
                     ],
                 );
-
                 $i++;
             }
         }
