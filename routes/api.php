@@ -72,6 +72,7 @@ Route::prefix('mobile')->name('api.mobile.')->group(function () {
         Route::post('onboarding/complete', MobileOnboardingController::class)->name('onboarding.complete');
 
         // Sync endpoints
+        Route::post('sync/status', [MobileSyncController::class, 'status'])->name('sync.status');
         Route::post('sync/bootstrap', [MobileSyncController::class, 'bootstrap'])->name('sync.bootstrap');
         Route::post('sync/next', [MobileSyncController::class, 'next'])->name('sync.next');
         Route::post('sync/delta', [MobileSyncController::class, 'delta'])->name('sync.delta');

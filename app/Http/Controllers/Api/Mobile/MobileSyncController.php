@@ -120,65 +120,74 @@ class MobileSyncController extends Controller
         ];
     }
 
-    public function bootstrap(Request $request): JsonResponse
+    public function status(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'schema_version' => 'nullable|integer|min:1',
+            'device_id' => 'nullable|string',
+        ]);
+
+        /** @var \App\Models\User $user */
         $user = $request->user();
-        $entities = [];
-
-        foreach ($this->entityConfig as $name => $config) {
-            $scope = $config['scope'];
-            $query = $config['model']::query()->orderByDesc('updated_at');
-            $scope($query, $user->id);
-
-            $totalCount = $query->count();
-            $size = $config['bootstrap_size'];
-
-            if ($size === null) {
-                $items = $query->get()->toArray();
-                $entities[$name] = [
-                    'items' => $items,
-                    'total_count' => $totalCount,
-                    'total_pages' => 1,
-                    'bootstrap_complete' => true,
-                ];
-            } else {
-                $totalPages = (int) ceil($totalCount / $size);
-                $items = (clone $query)->take($size)->get()->toArray();
-                $entities[$name] = [
-                    'items' => $items,
-                    'total_count' => $totalCount,
-                    'total_pages' => max($totalPages, 1),
-                    'bootstrap_complete' => $totalPages <= 1,
-                ];
-            }
-        }
-
-        // Catalog tables — always complete
-        $entities['type_vetements'] = [
-            'items' => TypeVetement::query()->orderBy('nom')->get()->toArray(),
-            'total_count' => TypeVetement::count(),
-            'total_pages' => 1,
-            'bootstrap_complete' => true,
-        ];
-        $entities['type_mesures'] = [
-            'items' => TypeMesure::query()->orderBy('nom')->get()->toArray(),
-            'total_count' => TypeMesure::count(),
-            'total_pages' => 1,
-            'bootstrap_complete' => true,
-        ];
+        $hasClients = $user->clients()->exists();
 
         return response()->json([
-            'data' => [
-                'schema_version' => self::SCHEMA_VERSION,
-                'server_time' => now()->toIso8601String(),
-                'user' => $user->toArray(),
-                'entities' => $entities,
+            'schema_version' => $validated['schema_version'] ?? self::SCHEMA_VERSION,
+            'server_time' => now()->toIso8601String(),
+            'minimum_client_version' => '1.0.0',
+            'bootstrap_required' => ! $hasClients,
+        ]);
+    }
+
+    public function bootstrap(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'schema_version' => 'nullable|integer|min:1',
+        ]);
+
+        $user = $request->user();
+        $user->loadCount(['clients as clients_count']);
+
+        $pageSize = config('sync.page_sizes.bootstrap.clients', 100);
+
+        $query = Client::query()
+            ->where('prestataire_id', $user->id)
+            ->orderBy('id')
+            ->take($pageSize);
+
+        $clients = $query->get();
+        $totalCount = Client::where('prestataire_id', $user->id)->count();
+
+        $lastPk = $clients->isNotEmpty() ? $clients->last()->id : 0;
+        $hasMore = $totalCount > $pageSize;
+
+        $cursor = base64_encode(json_encode([
+            'mode' => 'bootstrap',
+            'clients' => ['last_pk' => $lastPk, 'done' => ! $hasMore],
+            'created_at' => now()->toIso8601String(),
+        ]));
+
+        return response()->json([
+            'schema_version' => $validated['schema_version'] ?? self::SCHEMA_VERSION,
+            'minimum_client_version' => '1.0.0',
+            'cursor' => $cursor,
+            'has_more' => $hasMore,
+            'received' => ['clients' => $clients->count()],
+            'expected' => ['clients' => $totalCount],
+            'tables' => [
+                'clients' => $clients->toArray(),
             ],
         ]);
     }
 
     public function next(Request $request): JsonResponse
     {
+        // Support both legacy (entity+page) and v1 (cursor) formats
+        if ($request->has('cursor')) {
+            return $this->nextCursor($request);
+        }
+
+        // Legacy page-based next
         $validated = $request->validate([
             'entity' => 'required|string',
             'page' => 'required|integer|min:1',
@@ -186,32 +195,28 @@ class MobileSyncController extends Controller
         ]);
 
         $entity = $validated['entity'];
+        $page = (int) $validated['page'];
+        $pageSize = (int) ($validated['page_size'] ?? 50);
 
-        if (! isset($this->entityConfig[$entity])) {
-            return response()->json(['message' => 'Entité inconnue.'], 422);
+        $config = $this->entityConfig[$entity] ?? null;
+        if ($config === null) {
+            return response()->json(['message' => 'Unknown entity.'], 422);
         }
 
         $user = $request->user();
-        $config = $this->entityConfig[$entity];
-        $pageSize = $validated['page_size'] ?? $config['sync_size'];
+        $modelClass = $config['model'];
         $scope = $config['scope'];
 
-        $query = $config['model']::query()->orderByDesc('updated_at');
+        $query = $modelClass::query();
         $scope($query, $user->id);
 
-        $totalCount = $query->count();
+        $totalCount = (clone $query)->count();
         $totalPages = (int) ceil($totalCount / $pageSize);
-        $page = min($validated['page'], max($totalPages, 1));
-
-        $items = $query
-            ->skip(($page - 1) * $pageSize)
-            ->take($pageSize)
-            ->get()
-            ->toArray();
+        $items = $query->skip(($page - 1) * $pageSize)->take($pageSize)->get();
 
         return response()->json([
             'data' => [
-                'items' => $items,
+                'items' => $items->toArray(),
                 'page' => $page,
                 'page_size' => $pageSize,
                 'total_count' => $totalCount,
@@ -221,24 +226,98 @@ class MobileSyncController extends Controller
         ]);
     }
 
-    public function delta(Request $request): JsonResponse
+    private function nextCursor(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'entities' => 'required|array',
-            'entities.*.name' => 'required|string',
-            'entities.*.since' => 'required|date_format:Y-m-d\TH:i:s.v\Z',
+            'cursor' => 'required|string',
         ]);
+
+        $cursor = json_decode(base64_decode($validated['cursor']), true);
+
+        if (! $cursor || ($cursor['mode'] ?? null) !== 'bootstrap') {
+            return response()->json(['message' => 'Curseur invalide.'], 422);
+        }
+
+        $user = $request->user();
+
+        if (($cursor['clients']['done'] ?? false)) {
+            return response()->json([
+                'schema_version' => self::SCHEMA_VERSION,
+                'minimum_client_version' => '1.0.0',
+                'cursor' => $validated['cursor'],
+                'has_more' => false,
+                'received' => ['clients' => 0],
+                'expected' => ['clients' => Client::where('prestataire_id', $user->id)->count()],
+                'tables' => [],
+            ]);
+        }
+
+        $pageSize = config('sync.page_sizes.bootstrap.clients', 100);
+        $lastPk = $cursor['clients']['last_pk'] ?? 0;
+
+        $query = Client::query()
+            ->where('prestataire_id', $user->id)
+            ->where('id', '>', $lastPk)
+            ->orderBy('id')
+            ->take($pageSize);
+
+        $clients = $query->get();
+        $totalCount = Client::where('prestataire_id', $user->id)->where('id', '>', $lastPk)->count();
+        $newLastPk = $clients->isNotEmpty() ? $clients->last()->id : $lastPk;
+        $hasMore = $totalCount > $pageSize;
+
+        $cursor = base64_encode(json_encode([
+            'mode' => 'bootstrap',
+            'clients' => ['last_pk' => $newLastPk, 'done' => ! $hasMore],
+            'created_at' => now()->toIso8601String(),
+        ]));
+
+        return response()->json([
+            'schema_version' => self::SCHEMA_VERSION,
+            'minimum_client_version' => '1.0.0',
+            'cursor' => $cursor,
+            'has_more' => $hasMore,
+            'received' => ['clients' => $clients->count()],
+            'expected' => ['client' => Client::where('prestataire_id', $user->id)->count()],
+            'tables' => [
+                'clients' => $clients->toArray(),
+            ],
+        ]);
+    }
+
+    public function delta(Request $request): JsonResponse
+    {
+        // Support both legacy (entities[]+since) and v1 (cursor) formats
+        if ($request->has('cursor')) {
+            $validated = $request->validate([
+                'cursor' => 'required|string',
+                'device_id' => 'nullable|string',
+            ]);
+
+            $cursor = json_decode(base64_decode($validated['cursor']), true);
+            $since = $cursor['last_server_updated_at'] ?? now()->subDay()->toIso8601String();
+        } else {
+            $validated = $request->validate([
+                'entities' => 'required|array',
+                'entities.*.name' => 'required|string',
+                'entities.*.since' => 'required|date_format:Y-m-d\TH:i:s.v\Z',
+            ]);
+            $since = $validated['entities'][0]['since'] ?? now()->subDay()->toIso8601String();
+        }
 
         $user = $request->user();
         $result = [];
+        $received = [];
+        $expected = [];
 
-        foreach ($validated['entities'] as $e) {
-            $name = $e['name'];
-            $since = $e['since'];
+        $entityNames = $request->has('entities')
+            ? array_column($validated['entities'], 'name')
+            : array_keys($this->entityConfig);
 
+        foreach ($entityNames as $name) {
             if ($name === 'type_vetements' || $name === 'type_mesures') {
                 $model = $name === 'type_vetements' ? TypeVetement::class : TypeMesure::class;
-                $result[$name] = self::deltaQuery($model, null, $since);
+                $rows = self::deltaQuery($model, null, $since);
 
                 continue;
             }
@@ -253,43 +332,117 @@ class MobileSyncController extends Controller
                 $entityScope($q, $user->id);
             };
 
-            $result[$name] = self::deltaQuery($config['model'], $scope, $since);
+            $delta = self::deltaQuery($config['model'], $scope, $since);
+            $all = array_merge($delta['created'], $delta['updated'], $delta['deleted']);
+            if (! empty($all)) {
+                $result[$name] = $all;
+            }
+            $received[$name] = count($all);
+            $expected[$name] = $config['model']::count();
         }
 
+        $cursor = $this->buildDeltaCursor($since);
+
         return response()->json([
-            'data' => [
-                'entities' => $result,
-                'server_time' => now()->toIso8601String(),
-            ],
+            'cursor' => $cursor,
+            'has_more' => false,
+            'received' => $received,
+            'expected' => $expected,
+            'tables' => $result,
         ]);
+    }
+
+    private function buildDeltaCursor(string $since): string
+    {
+        return base64_encode(json_encode([
+            'mode' => 'delta',
+            'last_server_updated_at' => now()->toIso8601String(),
+        ]));
     }
 
     public function push(Request $request): JsonResponse
     {
+        // Support both legacy (mutation_id/entity/action/data) and v1 (uuid/table/operation/external_id/payload) formats
         $validated = $request->validate([
+            'device_id' => 'nullable|string',
             'mutations' => 'required|array',
-            'mutations.*.mutation_id' => 'required|uuid',
-            'mutations.*.entity' => 'required|string',
-            'mutations.*.action' => 'required|in:create,update,delete',
-            'mutations.*.data' => 'required|array',
+            'mutations.*.uuid' => 'required_without:mutations.*.mutation_id|string',
+            'mutations.*.table' => 'required_without:mutations.*.entity|string',
+            'mutations.*.operation' => 'required_without:mutations.*.action|in:create,update,delete',
+            'mutations.*.external_id' => 'nullable|string',
+            'mutations.*.payload' => 'required_without:mutations.*.data|array',
+            'mutations.*.mutation_id' => 'required_without:mutations.*.uuid|string',
+            'mutations.*.entity' => 'required_without:mutations.*.table|string',
+            'mutations.*.action' => 'required_without:mutations.*.operation|in:create,update,delete',
+            'mutations.*.data' => 'required_without:mutations.*.payload|array',
         ]);
 
         $user = $request->user();
-        $results = [];
+        $accepted = [];
+        $conflicts = [];
+        $failed = [];
 
         DB::beginTransaction();
         try {
             foreach ($validated['mutations'] as $mutation) {
-                $results[] = $this->processMutation($mutation, $user);
+                // Normalise v1 → legacy format for internal processing
+                $normalised = [
+                    'mutation_id' => $mutation['uuid'] ?? $mutation['mutation_id'],
+                    'entity' => $mutation['table'] ?? $mutation['entity'],
+                    'action' => $mutation['operation'] ?? $mutation['action'],
+                    'data' => $mutation['payload'] ?? $mutation['data'],
+                ];
+
+                try {
+                    $result = $this->processMutation($normalised, $user);
+                    $status = $result['status'] ?? '';
+                    if ($status === 'completed' || $status === 'duplicate') {
+                        $accepted[] = $normalised['mutation_id'];
+                    } elseif ($status === 'error' && str_contains($result['reason'] ?? '', 'Conflict')) {
+                        $conflicts[] = [
+                            'uuid' => $normalised['mutation_id'],
+                            'table' => $normalised['entity'],
+                            'external_id' => $mutation['external_id'] ?? $normalised['data']['external_id'] ?? '',
+                            'server_version' => ['error' => $result['reason'] ?? ''],
+                        ];
+                    } else {
+                        $failed[] = [
+                            'uuid' => $normalised['mutation_id'],
+                            'table' => $normalised['entity'],
+                            'error' => $result['reason'] ?? 'Unknown error',
+                        ];
+                    }
+                } catch (\Throwable $e) {
+                    $failed[] = [
+                        'uuid' => $normalised['mutation_id'],
+                        'table' => $normalised['entity'],
+                        'error' => $e->getMessage(),
+                    ];
+                }
             }
+
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            return response()->json(['message' => 'Erreur lors du traitement.', 'error' => $e->getMessage()], 500);
+            $failed[] = [
+                'uuid' => 'unknown',
+                'table' => 'unknown',
+                'error' => $e->getMessage(),
+            ];
         }
 
-        return response()->json(['data' => ['results' => $results]]);
+        $cursor = base64_encode(json_encode([
+            'mode' => 'delta',
+            'last_server_updated_at' => now()->toIso8601String(),
+        ]));
+
+        return response()->json([
+            'accepted' => $accepted,
+            'conflicts' => $conflicts,
+            'failed' => $failed,
+            'cursor' => $cursor,
+        ]);
     }
 
     private function processMutation(array $mutation, User $user): array
