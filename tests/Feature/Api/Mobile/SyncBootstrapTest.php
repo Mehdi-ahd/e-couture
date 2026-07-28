@@ -1,9 +1,12 @@
 <?php
 
 use App\Models\Client;
+use App\Models\CommandeVetement;
+use App\Models\FicheMesure;
 use App\Models\ModeleVetement;
 use App\Models\TypeVetement;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -38,6 +41,59 @@ test('bootstrap returns v1 protocol format', function () {
     expect($response->json('received.clients'))->toBe(3);
     expect($response->json('expected.clients'))->toBe(3);
     expect(count($response->json('tables.clients')))->toBe(3);
+});
+
+test('bootstrap returns the full sync table payload expected by flutter', function () {
+    $client = Client::factory()->create(['prestataire_id' => $this->user->id]);
+    $typeVetement = TypeVetement::create([
+        'external_id' => (string) Str::uuid(),
+        'code' => 'costume-test',
+        'nom' => 'Costume',
+        'description' => 'Test type',
+    ]);
+    $modele = ModeleVetement::factory()->create([
+        'prestataire_id' => $this->user->id,
+        'type_vetement_id' => $typeVetement->id,
+    ]);
+    $fiche = FicheMesure::create([
+        'external_id' => (string) Str::uuid(),
+        'client_id' => $client->id,
+        'date' => now()->toDateString(),
+        'methode' => 'manuel',
+    ]);
+    $commande = CommandeVetement::create([
+        'external_id' => (string) Str::uuid(),
+        'client_id' => $client->id,
+        'modele_vetement_id' => $modele->id,
+        'fiche_mesure_id' => $fiche->id,
+        'statut' => 'en_cours',
+        'notes' => 'test sync',
+        'date_commande' => now()->toDateString(),
+        'date_livraison' => now()->addDay()->toDateString(),
+    ]);
+
+    $response = $this->withToken($this->token)
+        ->postJson('/api/mobile/sync/bootstrap');
+
+    $response->assertOk();
+
+    expect($response->json('tables'))->toHaveKeys([
+        'clients',
+        'modeles',
+        'commandes',
+        'paiements',
+        'evenements',
+        'fiche_mesures',
+        'mesures',
+        'patrons',
+        'piece_patrons',
+        'annotation_patrons',
+    ]);
+    expect($response->json('tables.modeles.0.external_id'))->toBe($modele->external_id);
+    expect($response->json('tables.commandes.0.client_external_id'))->toBe($client->external_id);
+    expect($response->json('tables.commandes.0.modele_external_id'))->toBe($modele->external_id);
+    expect($response->json('tables.fiche_mesures.0.client_external_id'))->toBe($client->external_id);
+    expect($response->json('tables.commandes.0.external_id'))->toBe($commande->external_id);
 });
 
 test('bootstrap only returns data belonging to the authenticated user', function () {

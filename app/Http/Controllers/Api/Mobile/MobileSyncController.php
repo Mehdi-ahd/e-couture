@@ -3,18 +3,22 @@
 namespace App\Http\Controllers\Api\Mobile;
 
 use App\Http\Controllers\Controller;
+use App\Models\AnnotationPatron;
 use App\Models\Client;
 use App\Models\CommandeVetement;
+use App\Models\Evenement;
 use App\Models\FicheMesure;
 use App\Models\Mesure;
 use App\Models\MesureModele;
 use App\Models\ModeleVetement;
+use App\Models\Paiement;
 use App\Models\Patron;
 use App\Models\PiecePatron;
 use App\Models\TypeMesure;
 use App\Models\TypeVetement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,6 +28,32 @@ use Illuminate\Support\Str;
 class MobileSyncController extends Controller
 {
     private const SCHEMA_VERSION = 1;
+
+    private const BOOTSTRAP_ORDER = [
+        'clients',
+        'modeles',
+        'commandes',
+        'paiements',
+        'evenements',
+        'fiche_mesures',
+        'mesures',
+        'patrons',
+        'piece_patrons',
+        'annotation_patrons',
+    ];
+
+    private const OUTPUT_TO_CONFIG = [
+        'clients' => 'clients',
+        'modeles' => 'modele_vetements',
+        'commandes' => 'commande_vetements',
+        'paiements' => 'paiements',
+        'evenements' => 'evenements',
+        'fiche_mesures' => 'fiche_mesures',
+        'mesures' => 'mesures',
+        'patrons' => 'patrons',
+        'piece_patrons' => 'piece_patrons',
+        'annotation_patrons' => 'annotation_patrons',
+    ];
 
     private array $entityConfig = [];
 
@@ -82,12 +112,33 @@ class MobileSyncController extends Controller
                 'bootstrap_size' => config('sync.page_sizes.bootstrap.piece_patrons', 50),
                 'sync_size' => config('sync.page_sizes.sync.piece_patrons', 200),
             ],
+            'annotation_patrons' => [
+                'model' => AnnotationPatron::class,
+                'scope' => fn (Builder $q, int $userId) => $q,
+                'with' => ['piecePatron', 'typeMesure'],
+                'bootstrap_size' => config('sync.page_sizes.bootstrap.annotation_patrons', 50),
+                'sync_size' => config('sync.page_sizes.sync.annotation_patrons', 200),
+            ],
             'mesure_modeles' => [
                 'model' => MesureModele::class,
                 'scope' => fn (Builder $q, int $userId) => $q->whereHas('modeleVetement', fn (Builder $m) => $m->where('prestataire_id', $userId)),
                 'with' => ['typeMesure'],
                 'bootstrap_size' => config('sync.page_sizes.bootstrap.mesure_modeles', 50),
                 'sync_size' => config('sync.page_sizes.sync.mesure_modeles', 200),
+            ],
+            'paiements' => [
+                'model' => Paiement::class,
+                'scope' => fn (Builder $q, int $userId) => $q->whereHas('commande.client', fn (Builder $c) => $c->where('prestataire_id', $userId)),
+                'with' => ['commande'],
+                'bootstrap_size' => config('sync.page_sizes.bootstrap.paiements', 50),
+                'sync_size' => config('sync.page_sizes.sync.paiements', 200),
+            ],
+            'evenements' => [
+                'model' => Evenement::class,
+                'scope' => fn (Builder $q, int $userId) => $q->whereHas('commande.client', fn (Builder $c) => $c->where('prestataire_id', $userId)),
+                'with' => ['commande'],
+                'bootstrap_size' => config('sync.page_sizes.bootstrap.evenements', 50),
+                'sync_size' => config('sync.page_sizes.sync.evenements', 200),
             ],
         ];
 
@@ -117,6 +168,16 @@ class MobileSyncController extends Controller
                 'modele_vetement_id' => ['model' => ModeleVetement::class, 'field' => 'modele_vetement_id'],
                 'type_mesure_external_id' => ['model' => TypeMesure::class, 'field' => 'type_mesure_id'],
             ],
+            'paiements' => [
+                'commande_external_id' => ['model' => CommandeVetement::class, 'field' => 'commande_id'],
+            ],
+            'evenements' => [
+                'commande_external_id' => ['model' => CommandeVetement::class, 'field' => 'commande_id'],
+            ],
+            'annotation_patrons' => [
+                'piece_patron_id' => ['model' => PiecePatron::class, 'field' => 'piece_patron_id'],
+                'type_mesure_external_id' => ['model' => TypeMesure::class, 'field' => 'type_mesure_id'],
+            ],
         ];
     }
 
@@ -127,7 +188,7 @@ class MobileSyncController extends Controller
             'device_id' => 'nullable|string',
         ]);
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $request->user();
         $hasClients = $user->clients()->exists();
 
@@ -141,53 +202,35 @@ class MobileSyncController extends Controller
 
     public function bootstrap(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $request->validate([
             'schema_version' => 'nullable|integer|min:1',
         ]);
 
         $user = $request->user();
-        $user->loadCount(['clients as clients_count']);
 
-        $pageSize = config('sync.page_sizes.bootstrap.clients', 100);
+        $tableCounts = $this->computeExpectedCounts($user);
 
-        $query = Client::query()
-            ->where('prestataire_id', $user->id)
-            ->orderBy('id')
-            ->take($pageSize);
-
-        $clients = $query->get();
-        $totalCount = Client::where('prestataire_id', $user->id)->count();
-
-        $lastPk = $clients->isNotEmpty() ? $clients->last()->id : 0;
-        $hasMore = $totalCount > $pageSize;
-
-        $cursor = base64_encode(json_encode([
+        $initialState = [
             'mode' => 'bootstrap',
-            'clients' => ['last_pk' => $lastPk, 'done' => ! $hasMore],
             'created_at' => now()->toIso8601String(),
-        ]));
+        ];
+        foreach (self::BOOTSTRAP_ORDER as $table) {
+            $initialState[$table] = ['last_pk' => 0, 'done' => false];
+        }
 
-        return response()->json([
-            'schema_version' => $validated['schema_version'] ?? self::SCHEMA_VERSION,
-            'minimum_client_version' => '1.0.0',
-            'cursor' => $cursor,
-            'has_more' => $hasMore,
-            'received' => ['clients' => $clients->count()],
-            'expected' => ['clients' => $totalCount],
-            'tables' => [
-                'clients' => $clients->toArray(),
-            ],
-        ]);
+        return $this->buildPaginatedResponse(
+            user: $user,
+            cursorState: $initialState,
+            expected: $tableCounts,
+        );
     }
 
     public function next(Request $request): JsonResponse
     {
-        // Support both legacy (entity+page) and v1 (cursor) formats
         if ($request->has('cursor')) {
             return $this->nextCursor($request);
         }
 
-        // Legacy page-based next
         $validated = $request->validate([
             'entity' => 'required|string',
             'page' => 'required|integer|min:1',
@@ -232,132 +275,383 @@ class MobileSyncController extends Controller
             'cursor' => 'required|string',
         ]);
 
-        $cursor = json_decode(base64_decode($validated['cursor']), true);
+        $cursorState = json_decode(base64_decode($validated['cursor']), true);
 
-        if (! $cursor || ($cursor['mode'] ?? null) !== 'bootstrap') {
+        if (! $cursorState || ($cursorState['mode'] ?? null) !== 'bootstrap') {
             return response()->json(['message' => 'Curseur invalide.'], 422);
         }
 
         $user = $request->user();
+        $tableCounts = $this->computeExpectedCounts($user);
 
-        if (($cursor['clients']['done'] ?? false)) {
-            return response()->json([
-                'schema_version' => self::SCHEMA_VERSION,
-                'minimum_client_version' => '1.0.0',
-                'cursor' => $validated['cursor'],
-                'has_more' => false,
-                'received' => ['clients' => 0],
-                'expected' => ['clients' => Client::where('prestataire_id', $user->id)->count()],
-                'tables' => [],
-            ]);
-        }
-
-        $pageSize = config('sync.page_sizes.bootstrap.clients', 100);
-        $lastPk = $cursor['clients']['last_pk'] ?? 0;
-
-        $query = Client::query()
-            ->where('prestataire_id', $user->id)
-            ->where('id', '>', $lastPk)
-            ->orderBy('id')
-            ->take($pageSize);
-
-        $clients = $query->get();
-        $totalCount = Client::where('prestataire_id', $user->id)->where('id', '>', $lastPk)->count();
-        $newLastPk = $clients->isNotEmpty() ? $clients->last()->id : $lastPk;
-        $hasMore = $totalCount > $pageSize;
-
-        $cursor = base64_encode(json_encode([
-            'mode' => 'bootstrap',
-            'clients' => ['last_pk' => $newLastPk, 'done' => ! $hasMore],
-            'created_at' => now()->toIso8601String(),
-        ]));
-
-        return response()->json([
-            'schema_version' => self::SCHEMA_VERSION,
-            'minimum_client_version' => '1.0.0',
-            'cursor' => $cursor,
-            'has_more' => $hasMore,
-            'received' => ['clients' => $clients->count()],
-            'expected' => ['client' => Client::where('prestataire_id', $user->id)->count()],
-            'tables' => [
-                'clients' => $clients->toArray(),
-            ],
-        ]);
+        return $this->buildPaginatedResponse(
+            user: $user,
+            cursorState: $cursorState,
+            expected: $tableCounts,
+        );
     }
 
     public function delta(Request $request): JsonResponse
     {
-        // Support both legacy (entities[]+since) and v1 (cursor) formats
         if ($request->has('cursor')) {
             $validated = $request->validate([
                 'cursor' => 'required|string',
                 'device_id' => 'nullable|string',
             ]);
 
-            $cursor = json_decode(base64_decode($validated['cursor']), true);
-            $since = $cursor['last_server_updated_at'] ?? now()->subDay()->toIso8601String();
-        } else {
-            $validated = $request->validate([
-                'entities' => 'required|array',
-                'entities.*.name' => 'required|string',
-                'entities.*.since' => 'required|date_format:Y-m-d\TH:i:s.v\Z',
-            ]);
-            $since = $validated['entities'][0]['since'] ?? now()->subDay()->toIso8601String();
+            $cursorState = json_decode(base64_decode($validated['cursor']), true);
+
+            if (! $cursorState || ($cursorState['mode'] ?? null) !== 'delta') {
+                return response()->json(['message' => 'Curseur invalide.'], 422);
+            }
+
+            $user = $request->user();
+            $tableCounts = $this->computeExpectedCountsSince($user, $cursorState['last_server_updated_at'] ?? now()->subDay()->toIso8601String());
+
+            return $this->buildPaginatedResponse(
+                user: $user,
+                cursorState: $cursorState,
+                expected: $tableCounts,
+            );
         }
 
+        $validated = $request->validate([
+            'entities' => 'required|array',
+            'entities.*.name' => 'required|string',
+            'entities.*.since' => 'required|date_format:Y-m-d\TH:i:s.v\Z',
+        ]);
+
+        $since = $validated['entities'][0]['since'] ?? now()->subDay()->toIso8601String();
         $user = $request->user();
-        $result = [];
-        $received = [];
-        $expected = [];
 
-        $entityNames = $request->has('entities')
-            ? array_column($validated['entities'], 'name')
-            : array_keys($this->entityConfig);
-
-        foreach ($entityNames as $name) {
-            if ($name === 'type_vetements' || $name === 'type_mesures') {
-                $model = $name === 'type_vetements' ? TypeVetement::class : TypeMesure::class;
-                $rows = self::deltaQuery($model, null, $since);
-
-                continue;
-            }
-
-            if (! isset($this->entityConfig[$name])) {
-                continue;
-            }
-
-            $config = $this->entityConfig[$name];
-            $entityScope = $config['scope'];
-            $scope = function (Builder $q) use ($entityScope, $user) {
-                $entityScope($q, $user->id);
-            };
-
-            $delta = self::deltaQuery($config['model'], $scope, $since);
-            $all = array_merge($delta['created'], $delta['updated'], $delta['deleted']);
-            if (! empty($all)) {
-                $result[$name] = $all;
-            }
-            $received[$name] = count($all);
-            $expected[$name] = $config['model']::count();
+        $initialState = [
+            'mode' => 'delta',
+            'last_server_updated_at' => $since,
+        ];
+        foreach (self::BOOTSTRAP_ORDER as $table) {
+            $initialState[$table] = ['last_pk' => 0, 'done' => false];
         }
 
-        $cursor = $this->buildDeltaCursor($since);
+        $tableCounts = $this->computeExpectedCountsSince($user, $since);
+
+        return $this->buildPaginatedResponse(
+            user: $user,
+            cursorState: $initialState,
+            expected: $tableCounts,
+        );
+    }
+
+    private function buildPaginatedResponse(
+        User $user,
+        array $cursorState,
+        array $expected,
+    ): JsonResponse {
+        $activeTable = $this->findActiveTable($cursorState);
+
+        if ($activeTable === null) {
+            $cursorState['created_at'] = now()->toIso8601String();
+
+            return response()->json([
+                'schema_version' => self::SCHEMA_VERSION,
+                'minimum_client_version' => '1.0.0',
+                'cursor' => base64_encode(json_encode($cursorState)),
+                'has_more' => false,
+                'received' => [],
+                'expected' => $expected,
+                'tables' => [],
+            ]);
+        }
+
+        $configKey = self::OUTPUT_TO_CONFIG[$activeTable];
+        $config = $this->entityConfig[$configKey];
+        $mode = $cursorState['mode'] ?? 'bootstrap';
+        $lastPk = $cursorState[$activeTable]['last_pk'] ?? 0;
+        $since = $cursorState['last_server_updated_at'] ?? null;
+
+        $pageSize = $mode === 'bootstrap'
+            ? ($config['bootstrap_size'] ?? 50)
+            : ($config['sync_size'] ?? 100);
+
+        $rows = $this->fetchPage($config, $mode, $lastPk, $since, $user, $pageSize);
+
+        $data = $this->mapRows($activeTable, $rows);
+
+        $newLastPk = $rows->isNotEmpty() ? $rows->last()->id : $lastPk;
+
+        $hasMoreInTable = $this->hasMoreData($config, $mode, $newLastPk, $since, $user);
+
+        $cursorState[$activeTable] = [
+            'last_pk' => $newLastPk,
+            'done' => ! $hasMoreInTable,
+        ];
+
+        $nextActive = $this->findActiveTable($cursorState);
+        $hasMoreOverall = $nextActive !== null;
 
         return response()->json([
-            'cursor' => $cursor,
-            'has_more' => false,
-            'received' => $received,
+            'schema_version' => self::SCHEMA_VERSION,
+            'minimum_client_version' => '1.0.0',
+            'cursor' => base64_encode(json_encode($cursorState)),
+            'has_more' => $hasMoreOverall,
+            'received' => [$activeTable => count($rows)],
             'expected' => $expected,
-            'tables' => $result,
+            'tables' => [$activeTable => $data],
         ]);
     }
 
-    private function buildDeltaCursor(string $since): string
+    private function findActiveTable(array $cursorState): ?string
     {
-        return base64_encode(json_encode([
-            'mode' => 'delta',
-            'last_server_updated_at' => now()->toIso8601String(),
-        ]));
+        foreach (self::BOOTSTRAP_ORDER as $table) {
+            $state = $cursorState[$table] ?? null;
+            if ($state === null || ! ($state['done'] ?? false)) {
+                return $table;
+            }
+        }
+
+        return null;
+    }
+
+    private function fetchPage(
+        array $config,
+        string $mode,
+        int $lastPk,
+        ?string $since,
+        User $user,
+        int $pageSize,
+    ): Collection {
+        $modelClass = $config['model'];
+        $scope = $config['scope'];
+
+        $query = $modelClass::query();
+
+        if (! empty($config['with'])) {
+            $query->with($config['with']);
+        }
+
+        $scope($query, $user->id);
+
+        if ($mode === 'delta' && $since !== null) {
+            $query->where(function (Builder $q) use ($since): void {
+                $q->where('updated_at', '>', $since)
+                    ->orWhere('created_at', '>', $since)
+                    ->orWhereNotNull('deleted_at');
+            })->orderBy('updated_at')->orderBy('id');
+        } else {
+            $query->orderBy('id');
+        }
+
+        return $query->where('id', '>', $lastPk)->take($pageSize)->get();
+    }
+
+    private function hasMoreData(
+        array $config,
+        string $mode,
+        int $lastPk,
+        ?string $since,
+        User $user,
+    ): bool {
+        $modelClass = $config['model'];
+        $scope = $config['scope'];
+
+        $query = $modelClass::query();
+        $scope($query, $user->id);
+
+        if ($mode === 'delta' && $since !== null) {
+            $query->where(function (Builder $q) use ($since): void {
+                $q->where('updated_at', '>', $since)
+                    ->orWhere('created_at', '>', $since)
+                    ->orWhereNotNull('deleted_at');
+            });
+        }
+
+        return $query->where('id', '>', $lastPk)->exists();
+    }
+
+    private function computeExpectedCounts(User $user): array
+    {
+        $counts = [];
+        foreach (self::BOOTSTRAP_ORDER as $table) {
+            $configKey = self::OUTPUT_TO_CONFIG[$table];
+            $config = $this->entityConfig[$configKey];
+            $modelClass = $config['model'];
+            $scope = $config['scope'];
+
+            $query = $modelClass::query();
+            $scope($query, $user->id);
+
+            $counts[$table] = $query->count();
+        }
+
+        return $counts;
+    }
+
+    private function computeExpectedCountsSince(User $user, string $since): array
+    {
+        $counts = [];
+        foreach (self::BOOTSTRAP_ORDER as $table) {
+            $configKey = self::OUTPUT_TO_CONFIG[$table];
+            $config = $this->entityConfig[$configKey];
+            $modelClass = $config['model'];
+            $scope = $config['scope'];
+
+            $query = $modelClass::query();
+            $scope($query, $user->id);
+
+            $query->where(function (Builder $q) use ($since): void {
+                $q->where('updated_at', '>', $since)
+                    ->orWhere('created_at', '>', $since)
+                    ->orWhereNotNull('deleted_at');
+            });
+
+            $counts[$table] = $query->count();
+        }
+
+        return $counts;
+    }
+
+    private function mapRows(string $tableKey, Collection $rows): array
+    {
+        return match ($tableKey) {
+            'clients' => $rows->map(fn (Client $c) => $this->toClientArray($c))->values()->all(),
+            'modeles' => $rows->map(fn (ModeleVetement $m) => $this->toModeleArray($m))->values()->all(),
+            'commandes' => $rows->map(fn (CommandeVetement $c) => $this->toCommandeArray($c))->values()->all(),
+            'paiements' => $rows->map(fn (Paiement $p) => $this->toPaiementArray($p))->values()->all(),
+            'evenements' => $rows->map(fn (Evenement $e) => $this->toEvenementArray($e))->values()->all(),
+            'fiche_mesures' => $rows->map(fn (FicheMesure $f) => $this->toFicheMesureArray($f))->values()->all(),
+            'mesures' => $rows->map(fn (Mesure $m) => $this->toMesureArray($m))->values()->all(),
+            'patrons' => $rows->map(fn (Patron $p) => $this->toPatronArray($p))->values()->all(),
+            'piece_patrons' => $rows->map(fn (PiecePatron $p) => $this->toPiecePatronArray($p))->values()->all(),
+            'annotation_patrons' => $rows->map(fn (AnnotationPatron $a) => $this->toAnnotationPatronArray($a))->values()->all(),
+            default => [],
+        };
+    }
+
+    private function toClientArray(Client $client): array
+    {
+        $data = $client->toArray();
+        $data['latitude'] = $data['latitude'] !== null ? (float) $data['latitude'] : null;
+        $data['longitude'] = $data['longitude'] !== null ? (float) $data['longitude'] : null;
+        $data['archived'] = ! ($client->est_actif ?? true);
+        $data['server_updated_at'] = $client->updated_at?->toIso8601String() ?? $client->created_at?->toIso8601String();
+        $data['created_at'] = $client->created_at?->toIso8601String();
+        $data['updated_at'] = $client->updated_at?->toIso8601String();
+        $data['deleted_at'] = $client->deleted_at?->toIso8601String();
+
+        return $data;
+    }
+
+    private function toModeleArray(ModeleVetement $modele): array
+    {
+        $data = $modele->toArray();
+        $data['server_updated_at'] = $modele->updated_at?->toIso8601String() ?? $modele->created_at?->toIso8601String();
+        $data['created_at'] = $modele->created_at?->toIso8601String();
+        $data['updated_at'] = $modele->updated_at?->toIso8601String();
+        $data['deleted_at'] = $modele->deleted_at?->toIso8601String();
+
+        return $data;
+    }
+
+    private function toCommandeArray(CommandeVetement $commande): array
+    {
+        $data = $commande->toArray();
+        $data['prix_total'] = (float) ($data['prix_total'] ?? 0);
+        $data['client_external_id'] = $commande->client?->external_id;
+        $data['modele_external_id'] = $commande->modeleVetement?->external_id;
+        $data['fiche_mesure_external_id'] = $commande->ficheMesure?->external_id;
+        $data['server_updated_at'] = $commande->updated_at?->toIso8601String() ?? $commande->created_at?->toIso8601String();
+        $data['created_at'] = $commande->created_at?->toIso8601String();
+        $data['updated_at'] = $commande->updated_at?->toIso8601String();
+        $data['deleted_at'] = $commande->deleted_at?->toIso8601String();
+
+        return $data;
+    }
+
+    private function toPaiementArray(Paiement $paiement): array
+    {
+        $data = $paiement->toArray();
+        $data['montant'] = (float) ($data['montant'] ?? 0);
+        $data['commande_external_id'] = $paiement->commande?->external_id;
+        $data['server_updated_at'] = $paiement->updated_at?->toIso8601String() ?? $paiement->created_at?->toIso8601String();
+        $data['created_at'] = $paiement->created_at?->toIso8601String();
+        $data['updated_at'] = $paiement->updated_at?->toIso8601String();
+        $data['deleted_at'] = $paiement->deleted_at?->toIso8601String();
+
+        return $data;
+    }
+
+    private function toEvenementArray(Evenement $evenement): array
+    {
+        $data = $evenement->toArray();
+        $data['commande_external_id'] = $evenement->commande?->external_id;
+        $data['server_updated_at'] = $evenement->updated_at?->toIso8601String() ?? $evenement->created_at?->toIso8601String();
+        $data['created_at'] = $evenement->created_at?->toIso8601String();
+        $data['updated_at'] = $evenement->updated_at?->toIso8601String();
+        $data['deleted_at'] = $evenement->deleted_at?->toIso8601String();
+
+        return $data;
+    }
+
+    private function toFicheMesureArray(FicheMesure $fiche): array
+    {
+        $data = $fiche->toArray();
+        $data['client_external_id'] = $fiche->client?->external_id;
+        $data['server_updated_at'] = $fiche->updated_at?->toIso8601String() ?? $fiche->created_at?->toIso8601String();
+        $data['created_at'] = $fiche->created_at?->toIso8601String();
+        $data['updated_at'] = $fiche->updated_at?->toIso8601String();
+        $data['deleted_at'] = $fiche->deleted_at?->toIso8601String();
+
+        return $data;
+    }
+
+    private function toMesureArray(Mesure $mesure): array
+    {
+        $data = $mesure->toArray();
+        $data['valeur'] = (float) ($data['valeur'] ?? 0);
+        $data['confiance'] = $data['confiance'] !== null ? (float) $data['confiance'] : null;
+        $data['fiche_mesure_external_id'] = $mesure->ficheMesure?->external_id;
+        $data['type_mesure_external_id'] = $mesure->typeMesure?->external_id;
+        $data['server_updated_at'] = $mesure->updated_at?->toIso8601String() ?? $mesure->created_at?->toIso8601String();
+        $data['created_at'] = $mesure->created_at?->toIso8601String();
+        $data['updated_at'] = $mesure->updated_at?->toIso8601String();
+        $data['deleted_at'] = $mesure->deleted_at?->toIso8601String();
+
+        return $data;
+    }
+
+    private function toPatronArray(Patron $patron): array
+    {
+        $data = $patron->toArray();
+        $data['modele_external_id'] = $patron->modeleVetement?->external_id;
+        $data['server_updated_at'] = $patron->updated_at?->toIso8601String() ?? $patron->created_at?->toIso8601String();
+        $data['created_at'] = $patron->created_at?->toIso8601String();
+        $data['updated_at'] = $patron->updated_at?->toIso8601String();
+        $data['deleted_at'] = $patron->deleted_at?->toIso8601String();
+
+        return $data;
+    }
+
+    private function toPiecePatronArray(PiecePatron $piece): array
+    {
+        $data = $piece->toArray();
+        $data['patron_external_id'] = $piece->patron?->external_id;
+        $data['server_updated_at'] = $piece->updated_at?->toIso8601String() ?? $piece->created_at?->toIso8601String();
+        $data['created_at'] = $piece->created_at?->toIso8601String();
+        $data['updated_at'] = $piece->updated_at?->toIso8601String();
+        $data['deleted_at'] = $piece->deleted_at?->toIso8601String();
+
+        return $data;
+    }
+
+    private function toAnnotationPatronArray(AnnotationPatron $annotation): array
+    {
+        $data = $annotation->toArray();
+        $data['piece_patron_external_id'] = $annotation->piecePatron?->external_id;
+        $data['server_updated_at'] = $annotation->updated_at?->toIso8601String() ?? $annotation->created_at?->toIso8601String();
+        $data['created_at'] = $annotation->created_at?->toIso8601String();
+        $data['updated_at'] = $annotation->updated_at?->toIso8601String();
+        $data['deleted_at'] = $annotation->deleted_at?->toIso8601String();
+
+        return $data;
     }
 
     public function push(Request $request): JsonResponse

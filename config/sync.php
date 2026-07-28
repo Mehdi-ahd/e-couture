@@ -14,7 +14,11 @@ return [
             'type_vetements' => null, // null = all
             'type_mesures' => null,
             'patrons' => 20,
+            'piece_patrons' => 50,
             'mesure_modeles' => 50,
+            'paiements' => 50,
+            'evenements' => 50,
+            'annotation_patrons' => 50,
         ],
         'sync' => [
             'clients' => 100,
@@ -23,7 +27,11 @@ return [
             'fiche_mesures' => 100,
             'mesures' => 200,
             'patrons' => 100,
+            'piece_patrons' => 200,
             'mesure_modeles' => 200,
+            'paiements' => 200,
+            'evenements' => 200,
+            'annotation_patrons' => 200,
         ],
     ],
 
