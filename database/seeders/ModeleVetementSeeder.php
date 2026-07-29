@@ -38,19 +38,6 @@ class ModeleVetementSeeder extends Seeder
             ['code' => 'CHEMISE_AFRICAINE_BRODEE', 'type_vetement_code' => 'CHEMISE', 'nom' => 'Chemise africaine brodée'],
             ['code' => 'CHEMISE_BAZIN', 'type_vetement_code' => 'CHEMISE', 'nom' => 'Chemise en bazin'],
 
-            // ── PULLS ──
-            ['code' => 'PULL_COL_ROND', 'type_vetement_code' => 'PULL', 'nom' => 'Pull col rond'],
-            ['code' => 'PULL_COL_V', 'type_vetement_code' => 'PULL', 'nom' => 'Pull col V'],
-            ['code' => 'PULL_COL_ROULE', 'type_vetement_code' => 'PULL', 'nom' => 'Pull col roulé'],
-            ['code' => 'SWEAT', 'type_vetement_code' => 'PULL', 'nom' => 'Sweat-shirt'],
-            ['code' => 'HOODIE', 'type_vetement_code' => 'PULL', 'nom' => 'Hoodie (pull à capuche)'],
-            ['code' => 'CARDIGAN', 'type_vetement_code' => 'PULL', 'nom' => 'Cardigan'],
-
-            // ── DÉBARDEURS ──
-            ['code' => 'DEBARDEUR_CLASSIQUE', 'type_vetement_code' => 'DEBARDEUR', 'nom' => 'Débardeur classique'],
-            ['code' => 'DEBARDEUR_SPORT', 'type_vetement_code' => 'DEBARDEUR', 'nom' => 'Débardeur sport'],
-            ['code' => 'MARCEL', 'type_vetement_code' => 'DEBARDEUR', 'nom' => 'Marcel'],
-
             // ── PANTALONS ──
             ['code' => 'PANTALON_DROIT', 'type_vetement_code' => 'PANTALON', 'nom' => 'Pantalon droit'],
             ['code' => 'PANTALON_SLIM', 'type_vetement_code' => 'PANTALON', 'nom' => 'Pantalon slim'],
@@ -124,13 +111,6 @@ class ModeleVetementSeeder extends Seeder
             ['code' => 'COMBI_SANS_MANCHES', 'type_vetement_code' => 'COMBINAISON', 'nom' => 'Combinaison sans manches'],
             ['code' => 'SALOPETTE', 'type_vetement_code' => 'COMBINAISON', 'nom' => 'Salopette'],
 
-            // ── MANTEAUX ──
-            ['code' => 'MANTEAU_CLASSIQUE', 'type_vetement_code' => 'MANTEAU', 'nom' => 'Manteau classique'],
-            ['code' => 'TRENCH_COAT', 'type_vetement_code' => 'MANTEAU', 'nom' => 'Trench-coat'],
-            ['code' => 'PARDESSUS', 'type_vetement_code' => 'MANTEAU', 'nom' => 'Pardessus'],
-            ['code' => 'CABAN', 'type_vetement_code' => 'MANTEAU', 'nom' => 'Caban'],
-            ['code' => 'PARKA', 'type_vetement_code' => 'MANTEAU', 'nom' => 'Parka'],
-
             // ── VESTES ──
             ['code' => 'VESTE_CLASSIQUE', 'type_vetement_code' => 'VESTE', 'nom' => 'Veste classique'],
             ['code' => 'BLAZER', 'type_vetement_code' => 'VESTE', 'nom' => 'Blazer'],
@@ -143,48 +123,6 @@ class ModeleVetementSeeder extends Seeder
             ['code' => 'VESTE_WAX', 'type_vetement_code' => 'VESTE', 'nom' => 'Veste en wax'],
             ['code' => 'VESTE_AFRICAINE_BRODEE', 'type_vetement_code' => 'VESTE', 'nom' => 'Veste africaine brodée'],
             ['code' => 'VESTE_BAZIN', 'type_vetement_code' => 'VESTE', 'nom' => 'Veste en bazin'],
-
-            // ── BLOUSONS ──
-            ['code' => 'BLOUSON_BOMBER', 'type_vetement_code' => 'BLOUSON', 'nom' => 'Blouson bomber'],
-            ['code' => 'BLOUSON_AVIATEUR', 'type_vetement_code' => 'BLOUSON', 'nom' => 'Blouson aviateur'],
-            ['code' => 'BLOUSON_CUIR', 'type_vetement_code' => 'BLOUSON', 'nom' => 'Blouson en cuir'],
-            ['code' => 'BLOUSON_COUPE_VENT', 'type_vetement_code' => 'BLOUSON', 'nom' => 'Blouson coupe-vent'],
-
-            // ── DOUDOUNES ──
-            ['code' => 'DOUDOUNE_LEGERE', 'type_vetement_code' => 'DOUDOUNE', 'nom' => 'Doudoune légère'],
-            ['code' => 'DOUDOUNE_LONGUE', 'type_vetement_code' => 'DOUDOUNE', 'nom' => 'Doudoune longue'],
-            ['code' => 'DOUDOUNE_SANS_MANCHES', 'type_vetement_code' => 'DOUDOUNE', 'nom' => 'Doudoune sans manches'],
-
-            // ── CHAUSSETTES ──
-            ['code' => 'CHAUSSETTE_COURTE', 'type_vetement_code' => 'CHAUSSETTE', 'nom' => 'Chaussettes courtes'],
-            ['code' => 'CHAUSSETTE_MI_HAUTE', 'type_vetement_code' => 'CHAUSSETTE', 'nom' => 'Chaussettes mi-hautes'],
-            ['code' => 'CHAUSSETTE_LONGUE', 'type_vetement_code' => 'CHAUSSETTE', 'nom' => 'Chaussettes longues'],
-            ['code' => 'SOCQUETTE', 'type_vetement_code' => 'CHAUSSETTE', 'nom' => 'Socquettes'],
-
-            // ── SOUS-VÊTEMENTS HOMME ──
-            ['code' => 'SLIP', 'type_vetement_code' => 'SOUS_VETEMENT', 'nom' => 'Slip'],
-            ['code' => 'BOXER', 'type_vetement_code' => 'SOUS_VETEMENT', 'nom' => 'Boxer'],
-            ['code' => 'CALECON', 'type_vetement_code' => 'SOUS_VETEMENT', 'nom' => 'Caleçon'],
-            ['code' => 'DEBARDEUR_CORPS', 'type_vetement_code' => 'SOUS_VETEMENT', 'nom' => 'Débardeur de corps'],
-
-            // ── SOUS-VÊTEMENTS FEMME ──
-            ['code' => 'CULOTTE_CLASSIQUE', 'type_vetement_code' => 'SOUS_VETEMENT', 'nom' => 'Culotte classique'],
-            ['code' => 'SHORTY', 'type_vetement_code' => 'SOUS_VETEMENT', 'nom' => 'Shorty'],
-            ['code' => 'STRING', 'type_vetement_code' => 'SOUS_VETEMENT', 'nom' => 'String'],
-            ['code' => 'TANGA', 'type_vetement_code' => 'SOUS_VETEMENT', 'nom' => 'Tanga'],
-            ['code' => 'BRASSIERE', 'type_vetement_code' => 'SOUS_VETEMENT', 'nom' => 'Brassière'],
-            ['code' => 'SOUTIEN_GORGE', 'type_vetement_code' => 'SOUS_VETEMENT', 'nom' => 'Soutien-gorge'],
-
-            // ── ÉCHARPES ──
-            ['code' => 'ECHARPE_CLASSIQUE', 'type_vetement_code' => 'ECHARPE', 'nom' => 'Écharpe classique'],
-            ['code' => 'CHECHE', 'type_vetement_code' => 'ECHARPE', 'nom' => 'Chèche'],
-            ['code' => 'FOULARD', 'type_vetement_code' => 'ECHARPE', 'nom' => 'Foulard'],
-
-            // ── BONNETS ──
-            ['code' => 'BONNET_CLASSIQUE', 'type_vetement_code' => 'BONNET', 'nom' => 'Bonnet classique'],
-            ['code' => 'BONNET_REVERS', 'type_vetement_code' => 'BONNET', 'nom' => 'Bonnet à revers'],
-            ['code' => 'BERET', 'type_vetement_code' => 'BONNET', 'nom' => 'Béret'],
-            ['code' => 'BONNET_POMPON', 'type_vetement_code' => 'BONNET', 'nom' => 'Bonnet à pompon'],
 
             // ── TENUES TRADITIONNELLES ──
             ['code' => 'GRAND_BOUBOU', 'type_vetement_code' => 'TENUE_TRADITIONNELLE', 'nom' => 'Grand boubou'],

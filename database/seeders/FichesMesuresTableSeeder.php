@@ -15,7 +15,7 @@ class FichesMesuresTableSeeder extends Seeder
         $clients = Client::all();
         $typeMesures = TypeMesure::query()->pluck('id', 'code');
 
-        $defaultCodes = ['POITRINE', 'TAILLE', 'TOUR_HANCHES', 'EPAULES', 'HAUTEUR'];
+        $defaultCodes = ['POITRINE', 'CEINTURE', 'TOUR_FESSES', 'EPAULES', 'HAUTEUR'];
 
         foreach ($clients as $client) {
             $date = now()->subDays(rand(0, 120))->toDateString();

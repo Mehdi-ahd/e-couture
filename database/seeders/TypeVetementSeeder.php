@@ -28,23 +28,7 @@ class TypeVetementSeeder extends Seeder
                 'genre' => 'mixte',
                 'section' => 'adulte',
             ],
-            [
-                'code' => 'PULL',
-                'nom' => 'Pulls',
-                'description' => 'Pulls col rond, col V, col roulé, sweats, hoodies et cardigans.',
-                'categorie' => 'Hauts',
-                'genre' => 'mixte',
-                'section' => 'adulte',
-            ],
-            [
-                'code' => 'DEBARDEUR',
-                'nom' => 'Débardeurs',
-                'description' => 'Débardeurs classiques, sport et marcel.',
-                'categorie' => 'Hauts',
-                'genre' => 'mixte',
-                'section' => 'adulte',
-            ],
-
+        
             // ── BAS ──
             [
                 'code' => 'PANTALON',
@@ -99,14 +83,6 @@ class TypeVetementSeeder extends Seeder
 
             // ── VÊTEMENTS D'EXTÉRIEUR ──
             [
-                'code' => 'MANTEAU',
-                'nom' => 'Manteaux',
-                'description' => 'Manteaux classiques, trench-coats, pardessus, cabans et parkas.',
-                'categorie' => 'Vêtements d\'extérieur',
-                'genre' => 'mixte',
-                'section' => 'adulte',
-            ],
-            [
                 'code' => 'VESTE',
                 'nom' => 'Vestes',
                 'description' => 'Vestes classiques, blazers, vestes de costume, en jean, saharienne et militaire.',
@@ -114,56 +90,7 @@ class TypeVetementSeeder extends Seeder
                 'genre' => 'mixte',
                 'section' => 'adulte',
             ],
-            [
-                'code' => 'BLOUSON',
-                'nom' => 'Blousons',
-                'description' => 'Blousons bomber, aviateur, en cuir et coupe-vent.',
-                'categorie' => 'Vêtements d\'extérieur',
-                'genre' => 'mixte',
-                'section' => 'adulte',
-            ],
-            [
-                'code' => 'DOUDOUNE',
-                'nom' => 'Doudounes',
-                'description' => 'Doudounes légères, longues et sans manches.',
-                'categorie' => 'Vêtements d\'extérieur',
-                'genre' => 'mixte',
-                'section' => 'adulte',
-            ],
 
-            // ── SOUS-VÊTEMENTS ET ACCESSOIRES ──
-            [
-                'code' => 'CHAUSSETTE',
-                'nom' => 'Chaussettes',
-                'description' => 'Chaussettes courtes, mi-hautes, longues et socquettes.',
-                'categorie' => 'Sous-vêtements et accessoires',
-                'genre' => 'mixte',
-                'section' => 'adulte',
-            ],
-            [
-                'code' => 'SOUS_VETEMENT',
-                'nom' => 'Sous-vêtements',
-                'description' => 'Sous-vêtements hommes (slip, boxer, caleçon) et femmes (culotte, shorty, string, tanga, brassière, soutien-gorge).',
-                'categorie' => 'Sous-vêtements et accessoires',
-                'genre' => 'mixte',
-                'section' => 'adulte',
-            ],
-            [
-                'code' => 'ECHARPE',
-                'nom' => 'Écharpes',
-                'description' => 'Écharpes classiques, chèches et foulards.',
-                'categorie' => 'Sous-vêtements et accessoires',
-                'genre' => 'mixte',
-                'section' => 'adulte',
-            ],
-            [
-                'code' => 'BONNET',
-                'nom' => 'Bonnets',
-                'description' => 'Bonnets classiques, à revers, bérets et à pompon.',
-                'categorie' => 'Sous-vêtements et accessoires',
-                'genre' => 'mixte',
-                'section' => 'adulte',
-            ],
 
             // ── TENUES TRADITIONNELLES ──
             [
