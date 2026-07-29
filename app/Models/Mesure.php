@@ -2,30 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * Modele representant une mesure individuelle prise sur un client.
- * Liee a une fiche de mesures et a un type de mesure.
- */
-class Mesure extends Model
+class Mesure extends BaseModel
 {
-    use HasFactory;
-
     protected $table = 'mesures';
-
-    public $timestamps = false;
-
-    protected $fillable = [
-        'fiche_mesure_id',
-        'type_mesure_id',
-        'valeur',
-        'source',
-        'confiance',
-        'commentaire',
-    ];
 
     protected function casts(): array
     {

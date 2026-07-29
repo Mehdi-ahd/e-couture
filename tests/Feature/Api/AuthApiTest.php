@@ -6,6 +6,7 @@ test('api users can register and receive a sanctum token', function () {
     $response = $this->postJson('/api/auth/register', [
         'nom' => 'Doe',
         'prenom' => 'Jane',
+        'sexe' => 'femme',
         'telephone' => '+22990000002',
         'email' => 'jane@example.com',
         'password' => 'password',
@@ -26,6 +27,7 @@ test('api users can register and receive a sanctum token', function () {
                     'external_id',
                     'nom',
                     'prenom',
+                    'sexe',
                     'full_name',
                     'email',
                     'telephone',

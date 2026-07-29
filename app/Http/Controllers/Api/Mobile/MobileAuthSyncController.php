@@ -24,6 +24,7 @@ class MobileAuthSyncController extends Controller
             'external_id' => ['required', 'string', 'max:191'],
             'prenom' => ['required', 'string', 'max:80'],
             'nom' => ['required', 'string', 'max:80'],
+            'sexe' => ['required', 'string', 'in:homme,femme,autre'],
             'email' => ['nullable', 'email', 'max:190'],
             'telephone' => ['nullable', 'string', 'max:20'],
             'provider' => ['nullable', 'string', 'max:40'],
@@ -76,6 +77,7 @@ class MobileAuthSyncController extends Controller
             $user->fill([
                 'prenom' => $validated['prenom'],
                 'nom' => $validated['nom'],
+                'sexe' => $validated['sexe'],
                 'email' => $email ?? $user->email,
                 'telephone' => $validated['telephone'] ?? $user->telephone,
                 'est_actif' => true,
@@ -111,6 +113,7 @@ class MobileAuthSyncController extends Controller
                     'external_id' => $user->external_id,
                     'nom' => $user->nom,
                     'prenom' => $user->prenom,
+                    'sexe' => $user->sexe ?? 'autre',
                     'full_name' => $user->full_name,
                     'email' => $user->email,
                     'telephone' => $user->telephone,

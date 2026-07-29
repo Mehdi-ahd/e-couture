@@ -23,6 +23,7 @@ class Patron extends BaseModel
         'fichier_url',
         'donnees_dessin',
         'donnees_dessin_v2',
+        'fichier_koda',
         'statut',
     ];
 

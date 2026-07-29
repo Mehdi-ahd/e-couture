@@ -47,6 +47,7 @@ class User extends Authenticatable implements FilamentHasName, FilamentUser, Mus
         'external_id',
         'nom',
         'prenom',
+        'sexe',
         'email',
         'telephone',
         'password',

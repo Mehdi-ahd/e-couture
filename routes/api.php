@@ -12,14 +12,18 @@ use App\Http\Controllers\Api\Mobile\MobileMeasurementSheetController;
 use App\Http\Controllers\Api\Mobile\MobileOnboardingController;
 use App\Http\Controllers\Api\Mobile\MobileOrderController;
 use App\Http\Controllers\Api\Mobile\MobilePatternController;
+use App\Http\Controllers\Api\Mobile\MobilePatternKodaController;
 use App\Http\Controllers\Api\Mobile\MobilePatternPieceController;
+use App\Http\Controllers\Api\Mobile\MobilePatternPreviewController;
 use App\Http\Controllers\Api\Mobile\MobilePatternScanController;
 use App\Http\Controllers\Api\Mobile\MobilePatternTypeMesureController;
 use App\Http\Controllers\Api\Mobile\MobilePieceDispositionController;
 use App\Http\Controllers\Api\Mobile\MobilePingController;
+use App\Http\Controllers\Api\Mobile\MobileRegleProportionController;
 use App\Http\Controllers\Api\Mobile\MobileRemoveBgAccountController;
 use App\Http\Controllers\Api\Mobile\MobileScanController;
 use App\Http\Controllers\Api\Mobile\MobileSecurityController;
+use App\Http\Controllers\Api\Mobile\MobileSyncController;
 use App\Http\Controllers\Api\Mobile\MobileTypeMesureController;
 use App\Http\Controllers\Api\Mobile\MobileTypeVetementController;
 use App\Http\Controllers\Api\Mobile\MobileWorkspaceController;
@@ -66,6 +70,12 @@ Route::prefix('mobile')->name('api.mobile.')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('workspace', MobileWorkspaceController::class)->name('workspace');
         Route::post('onboarding/complete', MobileOnboardingController::class)->name('onboarding.complete');
+
+        // Sync endpoints
+        Route::post('sync/bootstrap', [MobileSyncController::class, 'bootstrap'])->name('sync.bootstrap');
+        Route::post('sync/next', [MobileSyncController::class, 'next'])->name('sync.next');
+        Route::post('sync/delta', [MobileSyncController::class, 'delta'])->name('sync.delta');
+        Route::post('sync/push', [MobileSyncController::class, 'push'])->name('sync.push');
         Route::apiResource('clients', MobileClientController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::apiResource('clients.measurement-sheets', MobileMeasurementSheetController::class)
             ->parameters(['clients' => 'client', 'measurement-sheets' => 'sheet'])
@@ -83,6 +93,9 @@ Route::prefix('mobile')->name('api.mobile.')->group(function () {
             ->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::get('patterns/{pattern}/type-mesures', [MobilePatternTypeMesureController::class, 'index'])->name('patterns.type-mesures.index');
         Route::put('patterns/{pattern}/type-mesures', [MobilePatternTypeMesureController::class, 'sync'])->name('patterns.type-mesures.sync');
+        Route::put('patterns/{pattern}/koda', [MobilePatternKodaController::class, 'upload'])->name('patterns.koda.upload');
+        Route::get('patterns/{pattern}/koda', [MobilePatternKodaController::class, 'download'])->name('patterns.koda.download');
+        Route::get('clients/{client}/orders/{order}/apercu-patron', [MobilePatternPreviewController::class, 'preview'])->name('clients.orders.pattern-preview');
         Route::post('scan/pattern', MobilePatternScanController::class)->name('scan.pattern');
         Route::get('scan/pattern/{scan}/cutout', [MobilePatternScanController::class, 'downloadCutout'])->name('scan.pattern.cutout');
         Route::get('remove-bg/account', MobileRemoveBgAccountController::class)->name('remove-bg.account');

@@ -51,6 +51,7 @@ class MobileGuidedMeasurementSheetController extends Controller
                 'dos_url' => $request->input('dos_url'),
                 'profil_url' => $request->input('profil_url'),
                 'known_height_cm' => (float) $request->input('known_height_cm'),
+                'sexe' => $record->genre ?? 'mixte',
             ];
 
             $this->gateway->measure($payload);
