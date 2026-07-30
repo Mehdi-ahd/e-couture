@@ -14,7 +14,6 @@ class ClientsTableSeeder extends Seeder
 
         $beninClients = [
             ['nom' => 'Kodjo',    'prenom' => 'Brice',   'genre' => 'homme'],
-            ['nom' => 'Kouton',   'prenom' => 'Marie',   'genre' => 'femme'],
             ['nom' => 'Agan',     'prenom' => 'Rachelle', 'genre' => 'femme'],
             ['nom' => 'Bankole',  'prenom' => 'Pascal',  'genre' => 'homme'],
             ['nom' => 'Dossou',   'prenom' => 'Aicha',   'genre' => 'femme'],
@@ -23,6 +22,7 @@ class ClientsTableSeeder extends Seeder
             ['nom' => 'Kouassi',  'prenom' => 'David',   'genre' => 'homme'],
             ['nom' => 'Hounsou',  'prenom' => 'Gisèle',  'genre' => 'femme'],
             ['nom' => 'Assogba',  'prenom' => 'Marc',    'genre' => 'homme'],
+            ['nom' => 'PATINDE',  'prenom' => 'Aarone',    'genre' => 'femme'],
         ];
 
         $i = 0;

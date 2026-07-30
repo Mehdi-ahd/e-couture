@@ -610,6 +610,7 @@ class MobileSyncController extends Controller
         $data['confiance'] = $data['confiance'] !== null ? (float) $data['confiance'] : null;
         $data['fiche_mesure_external_id'] = $mesure->ficheMesure?->external_id;
         $data['type_mesure_external_id'] = $mesure->typeMesure?->external_id;
+        $data['type_mesure_code'] = $mesure->typeMesure?->code;
         $data['server_updated_at'] = $mesure->updated_at?->toIso8601String() ?? $mesure->created_at?->toIso8601String();
         $data['created_at'] = $mesure->created_at?->toIso8601String();
         $data['updated_at'] = $mesure->updated_at?->toIso8601String();
@@ -646,6 +647,8 @@ class MobileSyncController extends Controller
     {
         $data = $annotation->toArray();
         $data['piece_patron_external_id'] = $annotation->piecePatron?->external_id;
+        $data['type_mesure_external_id'] = $annotation->typeMesure?->external_id;
+        $data['type_mesure_code'] = $annotation->typeMesure?->code;
         $data['server_updated_at'] = $annotation->updated_at?->toIso8601String() ?? $annotation->created_at?->toIso8601String();
         $data['created_at'] = $annotation->created_at?->toIso8601String();
         $data['updated_at'] = $annotation->updated_at?->toIso8601String();

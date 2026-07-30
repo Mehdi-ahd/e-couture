@@ -35,6 +35,8 @@ class TypeMesuresTableSeeder extends Seeder
             ['code' => 'CARRURE_DEVANT', 'nom' => 'Carrure devant',              'unite' => 'cm', 'categorie' => 'largeur',      'description' => 'Largeur entre les emmanchures côté face.'],
             ['code' => 'CARRURE_DOS',    'nom' => 'Carrure dos',                 'unite' => 'cm', 'categorie' => 'largeur',      'description' => 'Largeur entre les emmanchures côté dos.'],
             ['code' => 'TOUR_BAS',       'nom' => 'Tour du bas (cheville)',      'unite' => 'cm', 'categorie' => 'circonference', 'description' => 'Périmètre de la cheville estimé par ratio.'],
+            ['code' => 'LONGUEUR_SOUS_SEINS', 'nom' => 'Longueur sous-poitrine', 'unite' => 'cm', 'categorie' => 'longueur',     'description' => 'Distance épaule → niveau sous-poitrine.'],
+            ['code' => 'TOUR_SOUS_SEINS',     'nom' => 'Tour de sous-poitrine',   'unite' => 'cm', 'categorie' => 'circonference', 'description' => 'Tour de sous-poitrine estimé par ellipse ou ratio.'],
         ];
 
         foreach ($types as $t) {
