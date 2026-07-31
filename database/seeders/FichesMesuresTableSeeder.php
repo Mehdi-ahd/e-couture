@@ -52,7 +52,7 @@ class FichesMesuresTableSeeder extends Seeder
         if ($aarone && $typeMesures->isNotEmpty()) {
             $fiche = FicheMesure::query()->firstOrCreate(
                 ['client_id' => $aarone->id, 'date' => now()->toDateString()],
-                ['methode' => 'manuelle'],
+                ['methode' => 'automatique'],
             );
 
             $mesures = [
