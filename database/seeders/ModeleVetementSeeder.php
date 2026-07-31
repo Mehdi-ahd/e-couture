@@ -13,6 +13,44 @@ class ModeleVetementSeeder extends Seeder
     {
         $typeId = fn (string $code) => TypeVetement::where('code', $code)->value('id');
 
+        $images = [
+            'TSHIRT_COL_ROND'          => 'storage/images_modeles/TSHIRT_COL_ROND.png',
+            'TSHIRT_COL_V'             => 'storage/images_modeles/TSHIRT_COL_V.jpg',
+            'TSHIRT_MANCHES_LONGUES'   => 'storage/images_modeles/TSHIRT_MANCHES_LONGUES.jpg',
+            'POLO'                     => 'storage/images_modeles/POLO.jpg',
+            'CHEMISE_MANCHES_COURTES'  => 'storage/images_modeles/CHEMISE_MANCHES_COURTES.jpg',
+            'CHEMISE_MANCHES_LONGUES'  => 'storage/images_modeles/CHEMISE_MANCHES_LONGUES.jpg',
+            'CHEMISE_COL_MAO'          => 'storage/images_modeles/CHEMISE_COL_MAO.jpg',
+            'CHEMISE_JEAN'             => 'storage/images_modeles/CHEMISE_JEAN.jpg',
+            'CHEMISE_WAX'              => 'storage/images_modeles/CHEMISE_WAX.jpeg',
+            'CHEMISE_AFRICAINE_BRODEE' => 'storage/images_modeles/CHEMISE_AFRICAINE_BRODEE.jpg',
+            'CARGO'                    => 'storage/images_modeles/CARGO.jpg',
+            'PANTALON_PALAZZO'         => 'storage/images_modeles/PANTALON_PALAZZO.jpg',
+            'PANTALON_TAILLE_HAUTE'    => 'storage/images_modeles/PANTALON_TAILLE_HAUTE.jpg',
+            'JEAN_DROIT'               => 'storage/images_modeles/JEAN_DROIT.jpg',
+            'JEAN_BOOTCUT'             => 'storage/images_modeles/JEAN_BOOTCUT.jpg',
+            'JEAN_CARGO'               => 'storage/images_modeles/JEAN_CARGO.jpg',
+            'JUPE_DROITE'              => 'storage/images_modeles/JUPE_DROITE.jpg',
+            'JUPE_CRAYON'              => 'storage/images_modeles/JUPE_CRAYON.jpg',
+            'JUPE_EVASEE'              => 'storage/images_modeles/JUPE_EVASEE.jpg',
+            'JUPE_PLISSEE'             => 'storage/images_modeles/JUPE_PLISSEE.jpg',
+            'JUPE_PORTEFEUILLE'        => 'storage/images_modeles/JUPE_PORTEFEUILLE.jpg',
+            'SHORT_CLASSIQUE'          => 'storage/images_modeles/SHORT_CLASSIQUE.jpg',
+            'SHORT_CARGO'              => 'storage/images_modeles/SHORT_CARGO.jpg',
+            'ROBE_DROITE'              => 'storage/images_modeles/ROBE_DROITE.jpeg',
+            'ROBE_FOURREAU'            => 'storage/images_modeles/ROBE_FOURREAU.jpg',
+            'ROBE_DOS_NU'              => 'storage/images_modeles/ROBE_DOS_NU.jpg',
+            'ROBE_WAX'                 => 'storage/images_modeles/ROBE_WAX.jpg',
+            'ROBE_KABA'                => 'storage/images_modeles/ROBE_KABA.png',
+            'ROBE_AFRICAINE_LONGUE'    => 'storage/images_modeles/ROBE_AFRICAINE_LONGUE.jpg',
+            'VESTE_CLASSIQUE'          => 'storage/images_modeles/VESTE_CLASSIQUE.jpg',
+            'VESTE_JEAN'               => 'storage/images_modeles/VESTE_JEAN.jpg',
+            'VESTE_AFRICAINE_BRODEE'   => 'storage/images_modeles/VESTE_AFRICAINE_BRODEE.jpg',
+            'GRAND_BOUBOU'             => 'storage/images_modeles/GRAND_BOUBOU.jpg',
+            'AGBADA'                   => 'storage/images_modeles/AGBADA.png',
+            'CAFTAN'                   => 'storage/images_modeles/CAFTAN.jpg',
+        ];
+
         $modeles = [
             // ── T-SHIRTS ──
             ['code' => 'TSHIRT_COL_ROND', 'type_vetement_code' => 'TSHIRT', 'nom' => 'T-shirt col rond'],
@@ -133,14 +171,20 @@ class ModeleVetementSeeder extends Seeder
         ];
 
         foreach ($modeles as $modele) {
-            ModeleVetement::create([
+            $data = [
                 'external_id' => (string) Str::uuid(),
                 'type_vetement_id' => $typeId($modele['type_vetement_code']),
                 'nom' => $modele['nom'],
                 'description' => $modele['nom'],
                 'portee' => 'public',
                 'statut' => 'actif',
-            ]);
+            ];
+
+            if (isset($images[$modele['code']])) {
+                $data['image_url'] = $images[$modele['code']];
+            }
+
+            ModeleVetement::create($data);
         }
     }
 }

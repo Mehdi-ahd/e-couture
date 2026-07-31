@@ -543,6 +543,11 @@ class MobileSyncController extends Controller
     private function toModeleArray(ModeleVetement $modele): array
     {
         $data = $modele->toArray();
+
+        if ($data['image_url'] !== null) {
+            $data['image_url'] = url($data['image_url']);
+        }
+
         $data['server_updated_at'] = $modele->updated_at?->toIso8601String() ?? $modele->created_at?->toIso8601String();
         $data['created_at'] = $modele->created_at?->toIso8601String();
         $data['updated_at'] = $modele->updated_at?->toIso8601String();

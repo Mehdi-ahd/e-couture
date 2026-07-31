@@ -21,7 +21,6 @@ class ClientsTableSeeder extends Seeder
             ['nom' => 'Tognon',   'prenom' => 'Henri',   'genre' => 'homme'],
             ['nom' => 'Soglo',    'prenom' => 'Monique', 'genre' => 'femme'],
             ['nom' => 'Kouassi',  'prenom' => 'David',   'genre' => 'homme'],
-            ['nom' => 'PATINDE',  'prenom' => 'Aarone',    'genre' => 'femme'],
             ['nom' => 'Hounsou',  'prenom' => 'Gisèle',  'genre' => 'femme'],
             ['nom' => 'Assogba',  'prenom' => 'Marc',    'genre' => 'homme'],
         ];
@@ -43,6 +42,22 @@ class ClientsTableSeeder extends Seeder
                 );
                 $i++;
             }
+        }
+
+        // Lier PATINDE Aarone à la couturière nolanpatinde06@gmail.com
+        $prestataire = User::where('email', 'nolanpatinde06@gmail.com')->first();
+        if ($prestataire) {
+            Client::query()->updateOrCreate(
+                ['telephone' => '+22990123456'],
+                [
+                    'nom' => 'PATINDE',
+                    'prenom' => 'Aarone',
+                    'email' => 'aarone.patinde@example.bj',
+                    'genre' => 'femme',
+                    'prestataire_id' => $prestataire->id,
+                    'est_actif' => true,
+                ],
+            );
         }
     }
 }
